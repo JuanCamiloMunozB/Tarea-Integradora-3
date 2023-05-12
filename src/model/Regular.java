@@ -12,18 +12,31 @@ public class Regular extends User {
 	 */
 	public Regular(String name, String cc, Calendar vinculationDate) {
 		super(name, cc, vinculationDate);
-		// TODO - implement Regular.Regular
-		throw new UnsupportedOperationException();
 	}
 
-	public boolean countBooks() {
-		// TODO - implement Regular.countBooks
-		throw new UnsupportedOperationException();
+	public int countBooks() {
+		int booksCounter = 0;
+		
+		for (BibliographicProduct product : ownedProducts) {
+			if (product instanceof Book) {
+				booksCounter++;
+			}
+		}
+
+		return booksCounter;
 	}
 
-	public boolean countMagazines() {
-		// TODO - implement Regular.countMagazines
-		throw new UnsupportedOperationException();
+	public int countMagazines() {
+		int magazinesCounter = 0;
+		
+		for (BibliographicProduct product : ownedProducts) {
+			if (product instanceof Magazine) {
+				magazinesCounter++;
+			}
+		}
+
+		return magazinesCounter;
+		
 	}
 
 }

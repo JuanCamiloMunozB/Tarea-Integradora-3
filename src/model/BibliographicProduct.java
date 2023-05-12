@@ -98,4 +98,8 @@ public abstract class BibliographicProduct {
 		
 	}
 
+	public void setReadPages(int readPages){
+		this.readPages = readPages;
+	}
+
 }

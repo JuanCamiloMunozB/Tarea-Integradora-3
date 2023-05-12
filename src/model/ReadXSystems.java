@@ -8,9 +8,11 @@ import java.util.Random;
 public class ReadXSystems {
 
 	private List<BibliographicProduct> products;
+	private List<User> users;
 
 	public ReadXSystems() {
 		products = new ArrayList<>();
+		users = new ArrayList<>();
 	}
 
 	//Functional Requeriment 0: Register Books
@@ -138,7 +140,10 @@ public class ReadXSystems {
 	 * @param url
 	 * @param price
 	 */
-	public String modifyBookInfo(BibliographicProduct book, String name, int numPages, String review, Calendar publicationDate, int genreOption, String url, Double price) {
+	public String modifyBookInfo(String bookID, String name, int numPages, String review, Calendar publicationDate, int genreOption, String url, Double price) {
+
+		BibliographicProduct book = searchBibliographicProductByID(bookID);
+
 		Genre genre = null;
 		switch(genreOption){
 			case 1:
@@ -180,7 +185,10 @@ public class ReadXSystems {
 	 * @param price
 	 * @param periodicityEmission
 	 */
-	public String modifyMagazineInfo(BibliographicProduct magazine, String name, int numPages, Calendar publicationDate, int categoryOption, String url, Double price, int periodicityEmission) {
+	public String modifyMagazineInfo(String magazineID, String name, int numPages, Calendar publicationDate, int categoryOption, String url, Double price, int periodicityEmission) {
+
+		BibliographicProduct magazine = searchBibliographicProductByID(magazineID);
+		
 		Category category = null;
 		switch(categoryOption){
 			case 1:
@@ -211,17 +219,18 @@ public class ReadXSystems {
 
 	//Functional Requeriment 4: Eliminate BibliographicProducts
 
-	//Incomplete
+	//Incomplete: check if is necessary to erase a bibliographic product from user
 	/**
 	 * 
 	 * @param bibliographicProduct
 	 */
-	public String eliminateBibliographicProductFromArray(BibliographicProduct bibliographicProduct) {
-		String message = "The product has been deleated";
+	public boolean eliminateBibliographicProductFromArray(String productID) {
+		BibliographicProduct product = searchBibliographicProductByID(productID);
 
-		products.remove(bibliographicProduct);
+		boolean isProductRemoved = products.remove(product);
 
-		return message;
+		return isProductRemoved;
+
 	}
 
 	//Functional Requeriment 5: Register regular and premimum users
@@ -232,9 +241,26 @@ public class ReadXSystems {
 	 * @param name
 	 * @param cc
 	 */
-	public boolean addUser(int userOption, String name, String cc) {
-		// TODO - implement ReadXSystems.addUser
-		throw new UnsupportedOperationException();
+	public String addRegularUser(String name, String cc) {
+		String message = "The user has been registered successfully";
+
+		Calendar vinculationDate = getCurrentDate();
+
+		User regularUser = new Regular(name, cc, vinculationDate);
+		users.add(regularUser);
+
+		return message;
+	}
+
+	public String addPremiumUser(String name, String cc){
+		String message = "The user has been registered successfully";
+
+		Calendar vinculationDate = getCurrentDate();
+
+		User premiumUser = new Premium(name, cc, vinculationDate);
+		users.add(premiumUser);
+
+		return message;
 	}
 
 	//Functional Requeriment 6: Allow a user to purchase a book and subscribe to a magazine.
@@ -244,9 +270,16 @@ public class ReadXSystems {
 	 * @param user
 	 * @param product
 	 */
-	public boolean addBibliographicProductToUser(User user, BibliographicProduct product) {
-		// TODO - implement ReadXSystems.addBibliographicProductToUser
-		throw new UnsupportedOperationException();
+	public String addBibliographicProductToUser(String userCC, String productID) {
+		BibliographicProduct purchasedProduct =  searchBibliographicProductByID(productID);
+		User purchaser = searchUserByCC(userCC);
+		Double productPrice = purchasedProduct.getPrice();
+		Transaction bill = new Transaction(getCurrentDate(), productPrice, purchasedProduct);
+
+		purchaser.addBibliographicProduct(purchasedProduct);
+		purchaser.addTransaction(bill);
+		
+		return bill.getTransactionInfo();
 	}
 
 	//Functional Requeriment 7: Allow a user to unsubscribe from a magazine.
@@ -256,9 +289,11 @@ public class ReadXSystems {
 	 * @param user
 	 * @param magazine
 	 */
-	public boolean elimanteMagazineFromUser(User user, BibliographicProduct magazine) {
-		// TODO - implement ReadXSystems.elimanteMagazineFromUser
-		throw new UnsupportedOperationException();
+	public boolean elimanteMagazineFromUser(String userCC, String magazineID) {
+		BibliographicProduct searchedMagazine =  searchBibliographicProductByID(magazineID);
+		User searchedUser = searchUserByCC(userCC);
+
+		return searchedUser.removeProduct(searchedMagazine);
 	}
 
 	//Functional Requeriment 8: Present Users Library of Bibliographic Products
@@ -290,9 +325,59 @@ public class ReadXSystems {
 	 * @param bibliographicProduct
 	 * @param action
 	 */
-	public String startReadingSession(BibliographicProduct bibliographicProduct, char action) {
-		// TODO - implement ReadXSystems.startReadingSession
-		throw new UnsupportedOperationException();
+	public boolean innitReadingSession(String userCC, String productID) { //Incomplete
+		String message = "";
+
+		User user = searchUserByCC(userCC);
+		BibliographicProduct product = user.searchOwnedProductByID(productID);
+
+		if(product != null){
+			message = "Reading: "+product.getName()+"\n";
+		}else{
+			message = "This bibliographic product does not belong to the user";
+		}		
+		
+		return true;
+	}
+
+	//Incomplete
+	public String startReadingSession(BibliographicProduct product, String action){
+
+		String message = "";
+		int numPages = product.getNumPages(); // maximun number of pages
+		int numReadPages = 0; // number of pages read
+		int countReadPages = numReadPages; // counter of the readPages
+
+		switch(action){
+			case "A":
+				if(countReadPages<numPages){
+					if(countReadPages==numReadPages){
+						countReadPages++;
+						numReadPages++;
+					}else{
+						countReadPages++;
+					}
+				}else{
+					message += "there is no next page to this one. \n";
+				}
+			break;
+			
+			case "S":
+				if(countReadPages>0){
+					countReadPages--;
+				}else{
+					message += "there is no page before this one. \n";
+				}
+			break;
+
+			case "B":
+				message += "the reading session has ended. \n";
+			break;
+		}
+
+		product.setReadPages(countReadPages);
+
+		return message;
 	}
 	
 	//Functional Requeriment 11: Generate reports with recorded data
@@ -306,7 +391,7 @@ public class ReadXSystems {
 		BibliographicProduct searchedProduct = null;
 		
 		for (BibliographicProduct product : products) {
-			if (product.getID() == searchedProductID) {
+			if (product.getID().equalsIgnoreCase(searchedProductID)) {
 				searchedProduct = product;
 			}
 		}
@@ -332,8 +417,70 @@ public class ReadXSystems {
 	 * 
 	 * @param userCC
 	 */
-	public User searchUserByCC(String userCC) {
-		// TODO - implement ReadXSystems.searchUserByCC
-		throw new UnsupportedOperationException();
+	public User searchUserByCC(String searchedUserCC) {
+		User searchedUser = null;
+		
+		for (User user : users) {
+			if (user.getCC().equalsIgnoreCase(searchedUserCC)) {
+				searchedUser = user;
+			}
+		}
+
+		return searchedUser;
 	}
+
+	public int searchUserArrayPosition(String searchedUserCC){
+		int userPosition = -1;
+		boolean isFound = false;
+		
+		for(int i = 0; i < users.size() && !isFound ; i++){
+			if (users.get(i).getCC().equalsIgnoreCase(searchedUserCC)){
+				userPosition = i;
+				isFound = true;
+			}
+		}
+
+		return userPosition;
+
+	}
+
+	public Calendar getCurrentDate(){
+		Calendar currentDate = Calendar.getInstance();
+        int year = currentDate.get(Calendar.YEAR);
+        int month = currentDate.get(Calendar.MONTH);
+        int day = currentDate.get(Calendar.DAY_OF_MONTH);
+        currentDate.set(year, month, day);
+
+		return currentDate;
+
+	}
+
+	public int checkProductType(String productID){
+		int productsType = -1;
+
+		BibliographicProduct product = searchBibliographicProductByID(productID);
+
+		if(product instanceof Book){
+			productsType = 0;
+		}else if(product instanceof Magazine){
+			productsType = 1;
+		}
+
+		return productsType;
+	}
+
+	public int checkUserType(String usersCC){
+		int usersType = -1;
+
+		User user = searchUserByCC(usersCC);
+
+		if(user instanceof Regular){
+			usersType = 0;
+		}else if(user instanceof Premium){
+			usersType = 1;
+		}
+
+		return usersType;
+	}
+
 }
