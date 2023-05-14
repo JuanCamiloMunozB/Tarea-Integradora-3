@@ -288,7 +288,7 @@ public class Main {
 			int searchedProductType = controller.checkProductType(searchedProductID);
 
 			if(searchedProductType != -1){
-				System.out.println("The transaction has been successfully completed. \n...\n");
+				System.out.println("The transaction has been successfully completed. \n...");
 				System.out.println(controller.addBibliographicProductToUser(searchedUserCC, searchedProductID));
 			}else{
 				System.out.println("We couldn't found the product with the id "+searchedProductID);
@@ -306,6 +306,8 @@ public class Main {
 	//Functional Requeriment 7: Allow a user to unsubscribe from a magazine.
 
 	public void cancelMagazineSubscription() {
+
+		System.out.println("<< --------------------------------------------------------------------- >>");
 
 		System.out.print("Type the users cc: ");
 		String searchedUserCC = reader.nextLine();
@@ -355,7 +357,10 @@ public class Main {
 
 	}
 
-	public void simulateReadingSessionByID(){ //Incomplete
+	public void simulateReadingSessionByID(){
+
+		System.out.println("<< --------------------------------------------------------------------- >>");
+
 		System.out.print("\n<<Type the users cc that wants to start the reading session: ");
 		String searchedUserCC = reader.nextLine();
 
@@ -373,14 +378,14 @@ public class Main {
 				System.out.print(
 					"*****************************************"+
 					"\nReading Session in progress"+
-					"\nReading: "+controller.getProductByPositon(productPosition).getName()+
-					"\nReading page "+controller.getUserByPosition(userPosition).getPagesRead().get(productPosition)+" out of "+controller.getProductByPositon(productPosition).getNumPages()+
+					"\nReading: "+controller.getUserByPosition(userPosition).getOwnedProducts().get(productPosition).getName()+
+					"\nReading page "+controller.getUserByPosition(userPosition).getPagesRead().get(productPosition)+" out of "+controller.getUserByPosition(userPosition).getOwnedProducts().get(productPosition).getNumPages()+
 					"\nSelect one option: \nA. Go to the next page \nS. Go to the previous page\nB. Exit\n: "
 				);
 				
 				do{
-					action = reader.nextLine();
-					System.out.println(controller.startReadingSession(userPosition, productPosition, action));
+					action = reader.next();
+					System.out.print(controller.startReadingSession(userPosition, productPosition, action));
 				}while(!action.equalsIgnoreCase("B"));
 
 			}else{

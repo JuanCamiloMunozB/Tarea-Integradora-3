@@ -295,16 +295,33 @@ public class ReadXSystems {
 	 * @param product
 	 */
 	public String addBibliographicProductToUser(String userCC, String productID) {
+		String message = "";
+		int ownedBooks = 0;
+		int ownedMagazines = 0;
+
 		BibliographicProduct purchasedProduct =  searchBibliographicProductByID(productID);
 		User purchaser = searchUserByCC(userCC);
 		Double productPrice = purchasedProduct.getPrice();
 		Transaction bill = new Transaction(getCurrentDate(), productPrice, purchasedProduct);
 
-		purchaser.addBibliographicProduct(purchasedProduct);
-		purchaser.addPagesRead(0);
-		purchaser.addTransaction(bill);
+
+		if(purchaser instanceof Regular){	
+			ownedBooks = ((Regular)purchaser).countBooks();
+			ownedMagazines = ((Regular)purchaser).countMagazines();
+		}
+
+		if(purchaser instanceof Premium || ownedBooks<0 || ownedMagazines<2){
+			purchaser.addBibliographicProduct(purchasedProduct);
+			purchaser.addPagesRead(0);
+			purchaser.addTransaction(bill);
+
+			int soldCopies = purchasedProduct.getReadPages() + 1;
+			purchasedProduct.setReadPages(soldCopies);
+		}
 		
-		return bill.getTransactionInfo();
+		message = bill.getTransactionInfo();
+		
+		return message;
 	}
 
 	//Functional Requeriment 7: Allow a user to unsubscribe from a magazine.
@@ -364,14 +381,14 @@ public class ReadXSystems {
 	public String startReadingSession(int userPosition, int productPosition, String action){
 		User user = users.get(userPosition);
 		BibliographicProduct product = user.getOwnedProducts().get(productPosition);
-		int startPages = user.getPagesRead().get(productPosition);
-		int maxNumPages = product.getNumPages(); // maximun number of pages
+		int startPages = user.getPagesRead().get(productPosition); // the page where the user left
+		int maxNumPages = product.getNumPages(); // the total pages of the product
 		int numReadPages = startPages; // number of pages read
 		int countReadPages = startPages; // counter of the readPages 
 
 		String message = "";
 
-		if(action.equalsIgnoreCase("A")){
+		if(action.equalsIgnoreCase("a")){
 			if(countReadPages<maxNumPages){
 				if(countReadPages==numReadPages){
 					countReadPages++;
@@ -380,26 +397,28 @@ public class ReadXSystems {
 					countReadPages++;
 				}
 			}else{
-				message += "there is no next page to this one. \n";
+				message += "\nthere is no next page to this one. \n";
 			}
-		}else if(action.equalsIgnoreCase("S")){
+		}else if(action.equalsIgnoreCase("s")){
 			if(countReadPages>0){
 				countReadPages--;
 			}else{
-				message += "there is no page before this one. \n";
+				message += "\nthere is no page before this one. \n";
 			}
+		}else if(action.equalsIgnoreCase("b")){
+			message += "\nthe reading session has ended. \n";
 		}else{
-			message += "the reading session has ended. \n";
+			message += "\nInvalid option. Please, try again.";
 		}
 
-		product.setReadPages(numReadPages);
-		user.getPagesRead().set(userPosition, countReadPages);
+		product.setReadPages(product.getReadPages()+numReadPages);
+		user.getPagesRead().set(productPosition, countReadPages);
 
-		message = 
+		message += 
 		"*****************************************"+
 		"\nReading Session in progress"+
 		"\nReading: "+products.get(productPosition).getName()+
-		"\nReading page "+startPages+" out of "+products.get(productPosition).getNumPages()+
+		"\nReading page "+countReadPages+" out of "+products.get(productPosition).getNumPages()+
 		"\nSelect one option: \nA. Go to the next page \nS. Go to the previous page\nB. Exit\n: ";
 
 		return message;
@@ -415,8 +434,8 @@ public class ReadXSystems {
 		Calendar calendar2 = Calendar.getInstance();
 		calendar2.set(2021, 5, 1);
 
-		BibliographicProduct product1 = new Book("4AF", "A Game of Thrones", 694, "join adventures across the seven kingdoms", calendar1, Genre.FANTASY, "AGOT.png", 19.99);
-		BibliographicProduct product2 = new Magazine("ZIT", "Vogue", 40, calendar2,Category.VARIETIES, "LMV2021.jpg", 4.99,"Mensual");
+		BibliographicProduct product1 = new Book(generateHexIdentifier(), "A Game of Thrones", 694, "join adventures across the seven kingdoms", calendar1, Genre.FANTASY, "AGOT.png", 19.99);
+		BibliographicProduct product2 = new Magazine(generateAlphaIdentifier(), "Vogue", 40, calendar2,Category.VARIETIES, "LMV2021.jpg", 4.99,"Mensual");
 
 		products.add(product1);
 		products.add(product2);
