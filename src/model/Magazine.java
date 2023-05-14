@@ -4,7 +4,7 @@ import java.util.Calendar;
 
 public class Magazine extends BibliographicProduct {
 
-	private int periodicityEmission;
+	private String periodicityEmission;
 	private Category category;
 
 	/**
@@ -19,17 +19,31 @@ public class Magazine extends BibliographicProduct {
 	 * @param price
 	 * @param periodicityEmission
 	 */
-	public Magazine(String id, String name, int numPages, Calendar publicationDate, Category category, String url, Double price, int periodicityEmission) {
+	public Magazine(String id, String name, int numPages, Calendar publicationDate, Category category, String url, Double price, String periodicityEmission) {
 		super(id, name, numPages, publicationDate, url, price);
 		this.periodicityEmission = periodicityEmission;
 	}
 
-	public int getPeriodicityEmission() {
+	public String getPeriodicityEmission() {
 		return this.periodicityEmission;
 	}
 
 	public Category getCategory() {
 		return this.category;
+	}
+
+	public String getCategoryString(){
+		String category = "";
+		
+		if(this.category == Category.VARIETIES){
+			category = "Science Fiction ";
+		}else if(this.category == Category.DESIGN){
+			category = "Fantasy ";
+		}else if(this.category == Category.SCIENTIFIC){
+			category = "Historical Novel";
+		}
+
+		return category;
 	}
 
 	/**
@@ -40,7 +54,7 @@ public class Magazine extends BibliographicProduct {
 		this.category = category;		
 	}
 
-	public void setPeriodicityEmission(int periodicityEmission) {
+	public void setPeriodicityEmission(String periodicityEmission) {
 		this.periodicityEmission = periodicityEmission;
 	}
 

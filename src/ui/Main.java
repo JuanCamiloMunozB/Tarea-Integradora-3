@@ -12,7 +12,6 @@ public class Main {
 
 	private Scanner reader;
 	private ReadXSystems controller;
-	//private Test test;
 	private SimpleDateFormat format;
 
 	public Main(){
@@ -113,50 +112,50 @@ public class Main {
 
 	public void registerBibliographicProduct() {
 
-		System.out.println(".................................................");
+		System.out.println("<< --------------------------------------------------------------------- >>");
 
-		System.out.print("Type the name of the product: ");
+		System.out.print("\n<<Type the name of the product: ");
 		String name = reader.nextLine();
 		
-		int numPages = validateInteger("Type the product number of pages: ");
+		int numPages = validateInteger("\n<<Type the product number of pages: ");
 
 		Calendar publicationDate = readDate("Type the date of publication: ");
 		
-		System.out.print("Type the url with the product's cover: ");
+		System.out.print("\n<<Type the url with the product's cover: ");
 		String url = reader.nextLine();
 		
-		Double price = validateDouble("Type the price of the product: ");
+		Double price = validateDouble("\n<<Type the price of the product: ");
 	
 
-		System.out.print("Available bibliographic products:\n1. Books \n2. Magazine\n");
-		int typeOption = validateOptionInputByRange("Select product's type: ", 1, 2);
+		System.out.println("\nAvailable bibliographic products:\n 1. Books \n 2. Magazine");
+		int typeOption = validateOptionInputByRange(" <<Select product's type: ", 1, 2);
 	
 		
 		switch(typeOption){
 			case 1:
 
-				System.out.print("Type the book's review: ");
+				System.out.print("\n<<Type the book's review: ");
 				String review = reader.nextLine();
 
-				System.out.println("Avilable book's genres:\n1.Science fiction\n2.Fantasy\n3.Historical novel");
-				int genreOption = validateOptionInputByRange("Select the genre: ", 1, 3);
+				System.out.println("\n<<Avilable book's genres:\n 1.Science fiction\n 2.Fantasy\n 3.Historical novel");
+				int genreOption = validateOptionInputByRange(" Select the genre: ", 1, 3);
 				
 				System.out.println(controller.addBook(name, numPages, review, publicationDate, genreOption, url, price));
 
-				System.out.println(".................................................");
+				System.out.println("<< --------------------------------------------------------------------- >>");
 
 			break;
 
 			case 2:
-				System.out.print("Type the emission periodicity");
-				int periodicityEmission = validateInteger(": ");
+				System.out.print("\n<<Type the emission periodicity");
+				String periodicityEmission = reader.nextLine();
 
-				System.out.println("Avilable magazines's categories:\n1.Varieties\n2.Design\n3.Scientific");
-				int categoryOption = validateOptionInputByRange("Select the category: ", 1, 3);
+				System.out.println("\n<<Avilable magazines's categories:\n 1.Varieties\n 2.Design\n 3.Scientific");
+				int categoryOption = validateOptionInputByRange(" Select the category: ", 1, 3);
 
 				System.out.println(controller.addMagazine(name, numPages, publicationDate, categoryOption, url, price, periodicityEmission));
 
-				System.out.println(".................................................");
+				System.out.println("<< --------------------------------------------------------------------- >>");
 			break;
 
 		}
@@ -168,60 +167,66 @@ public class Main {
 
 	public void modifyBibliographicProductInfo() {
 
-		System.out.println(".................................................");
+		System.out.println("<< --------------------------------------------------------------------- >>");
 
-		System.out.print("Type the identifier of the product you want to search: ");
+		System.out.print("\n<<Type the identifier of the product you want to search: ");
 		String searchedProductID = reader.next();
 
-		int searchedProductType = controller.checkProductType(searchedProductID);
+		int searchedProductPosition = controller.searchUserArrayPosition(searchedProductID);
 
-		if(searchedProductType != -1){
+		if(searchedProductPosition != -1){
+			int searchedProductType = controller.checkProductType(searchedProductID);
 
-			System.out.print("Type the name of the product: ");
+			System.out.print("\nCurrent name: "+controller.getProductByPositon(searchedProductPosition).getName()+"<<Type the name of the product: ");
 			String name = reader.next();
 
-			int numPages = validateInteger("Type the product number of pages: ");
+			System.out.println("\nCurrent number of pages: "+controller.getProductByPositon(searchedProductPosition).getNumPages());
+			int numPages = validateInteger("<<Type the product number of pages: ");
 
-			Calendar publicationDate = readDate("Type the date of publication: ");
+			System.out.println("\nCurrent publicationDate: "+controller.getProductByPositon(searchedProductPosition).getPublicationDateFormated());
+			Calendar publicationDate = readDate("<<Type the date of publication: ");
 
-			System.out.print("Type the url with the product's cover: ");
+			System.out.print("\nCurrent URL: "+controller.getProductByPositon(searchedProductPosition).getURL()+"<<Type the url with the product's cover: ");
 			String url = reader.next();
 
-			Double price = validateDouble("Type the price of the product: ");
+			System.out.println("\nCurrent price: "+controller.getProductByPositon(searchedProductPosition).getPrice());
+			Double price = validateDouble("<<Type the price of the product: ");
 
 			if(searchedProductType == 0){
-				System.out.print("Type the book's review: ");
+				System.out.print("\nCurrent review: "+controller.getProductCastedBook(searchedProductPosition).getReview()+"<<Type the book's review: ");
 				String review = reader.next();
 
-				System.out.println("Avilable book's genres:\n1.Science fiction\n2.Fantasy\n3.Historical novel\n");
-				int genreOption = validateOptionInputByRange("Select the genre: ", 1, 3);
+				System.out.println("\nCurrent genre: "+controller.getProductCastedBook(searchedProductPosition).getGenreString()+"Avilable book's genres:\n1.Science fiction\n2.Fantasy\n3.Historical novel");
+				int genreOption = validateOptionInputByRange("<<Select the genre: ", 1, 3);
 
-				System.out.println(".................................................");
+				System.out.println("<< --------------------------------------------------------------------- >>");
 
 				System.out.println(controller.modifyBookInfo(searchedProductID, name, numPages, review, publicationDate, genreOption, url, price));
+
 			}else if(searchedProductType == 1){	
-				int periodicityEmission = validateInteger("Type the periodicity emission: ");
+				System.out.print("\nCurrent periodicity emission: "+controller.getProductCastedMagazine(searchedProductPosition).getPeriodicityEmission()+"<<Type the emission periodicity");
+				String periodicityEmission = reader.nextLine();
 
-				System.out.println("Avilable magazines's categories:\n1.Varieties\n2.Design\n3.Scientific\n");
-				int categoryOption = validateOptionInputByRange("Select the category: ", 1, 3);
+				System.out.println("\nCurrent category: "+controller.getProductCastedMagazine(searchedProductPosition).getCategoryString()+"Avilable magazines's categories:\n1.Varieties\n2.Design\n3.Scientific");
+				int categoryOption = validateOptionInputByRange("<<Select the category: ", 1, 3);
 
-				System.out.println(".................................................");
+				System.out.println("<< --------------------------------------------------------------------- >>");
 
 				System.out.println(controller.modifyMagazineInfo(searchedProductID, name, numPages, publicationDate, categoryOption, url, price, periodicityEmission));
 			}				
 		}else{
 			System.out.println("We couldn't found the product with the id "+searchedProductID);
 
-			System.out.println(".................................................");
+			System.out.println("<< --------------------------------------------------------------------- >>");
 		}
 	}
 
 	//Functional Requeriment 4: Eliminate BibliographicProducts
 	
 	public void eliminateBibliographicProduct() {
-		System.out.println(".................................................");
+		System.out.println("<< --------------------------------------------------------------------- >>");
 
-		System.out.print("Type the identifier of the product you want to search: ");
+		System.out.print("\n<<Type the identifier of the product you want to search: ");
 		String searchedProductID = reader.next();
 
 		boolean isProductRemoved = controller.eliminateBibliographicProductFromArray(searchedProductID);
@@ -229,11 +234,11 @@ public class Main {
 		if(isProductRemoved){
 			System.out.println("The product has been removed. ");
 
-			System.out.println(".................................................");
+			System.out.println("<< --------------------------------------------------------------------- >>");
 		}else{
 			System.out.println("We couldn't found the product with the id "+searchedProductID);
 
-			System.out.println(".................................................");
+			System.out.println("<< --------------------------------------------------------------------- >>");
 		}
 		
 	}
@@ -241,16 +246,15 @@ public class Main {
 	//Functional Requeriment 5: Register regular and premimum users
 
 	public void registerUser() {
-		System.out.println(".................................................");
+		System.out.println("<< --------------------------------------------------------------------- >>");
 		
 		System.out.print("Available types of user:\n1. Regular \n2. Premium");
-		int userOption = validateOptionInputByRange("Select the type of user you want: ",1,2);
-		reader.nextLine();
+		int userOption = validateOptionInputByRange("\n<<Select the type of user you want: ",1,2);
 
-		System.out.print("Type your complete name: ");
+		System.out.print("\n<<Type your complete name: ");
 		String name = reader.nextLine();
 
-		System.out.print("Type your cc: ");
+		System.out.print("\n<<Type your cc: ");
 		String cc = reader.nextLine();
 
 		switch(userOption){
@@ -263,22 +267,22 @@ public class Main {
 			break;
 		}
 
-		System.out.print(".................................................");
+		System.out.print("<< --------------------------------------------------------------------- >>");
 	}
 
 	//Functional Requeriment 6: Allow a user to purchase a book and subscribe to a magazine.
 	
 	//Incomplete: validate if user can buy more products or magazines
 	public void makeTransaction() {
-		System.out.println(".................................................");
+		System.out.println("<< --------------------------------------------------------------------- >>");
 
-		System.out.print("Type the usersCC: ");
+		System.out.print("\n<<Type the usersCC: ");
 		String searchedUserCC = reader.nextLine();
 
 		int searchedUserType = controller.checkUserType(searchedUserCC);
 
 		if(searchedUserType != -1){
-			System.out.print("Type the identifier of the product you want to search: ");
+			System.out.print("\n<<Type the identifier of the product you want to search: ");
 			String searchedProductID = reader.nextLine();
 
 			int searchedProductType = controller.checkProductType(searchedProductID);
@@ -286,18 +290,15 @@ public class Main {
 			if(searchedProductType != -1){
 				System.out.println("The transaction has been successfully completed. \n...\n");
 				System.out.println(controller.addBibliographicProductToUser(searchedUserCC, searchedProductID));
-				System.out.println(".................................................");
 			}else{
 				System.out.println("We couldn't found the product with the id "+searchedProductID);
-
-				System.out.println(".................................................");
 			}			
 
-			System.out.println(".................................................");
+			System.out.println("<< --------------------------------------------------------------------- >>");
 		}else{
 			System.out.println("We couldn't found the user with the id "+searchedUserCC);
 
-			System.out.println(".................................................");
+			System.out.println("<< --------------------------------------------------------------------- >>");
 		}
 		
 	}
@@ -332,11 +333,11 @@ public class Main {
 				break;
 			}
 
-			System.out.println(".................................................");
+			System.out.println("<< --------------------------------------------------------------------- >>");
 		}else{
 			System.out.println("We couldn't found the user with the id "+searchedUserCC);
 
-			System.out.println(".................................................");
+			System.out.println("<< --------------------------------------------------------------------- >>");
 		}
 		
 	}
@@ -355,47 +356,49 @@ public class Main {
 	}
 
 	public void simulateReadingSessionByID(){ //Incomplete
-		System.out.print("Type the users cc that wants to start the reading session: ");
+		System.out.print("\n<<Type the users cc that wants to start the reading session: ");
 		String searchedUserCC = reader.nextLine();
 
-		int searchedUserType = controller.checkUserType(searchedUserCC);
+		int userPosition = controller.searchUserArrayPosition(searchedUserCC);
 
-		if(searchedUserType != -1){
-			System.out.print("Type the identifier of the bibliographic product you want to search: ");
+		if(userPosition != -1){
+			System.out.print("\n<<Type the identifier of the bibliographic product you want to search: ");
 			String searchedProductID = reader.nextLine();
 
-			int searchedProductType = controller.checkProductType(searchedProductID);
+			int productPosition = controller.getUserByPosition(userPosition).searchOwnedProductArrayPosition(searchedProductID);
 
-			if(searchedProductType != -1){
-				String answer = "";
-
-				System.out.println("********************************************");
-				System.out.println(" Reading session in progress: ");
-				int pages = validateInteger("From which page would you like to start reading?");
-
+			if(productPosition != -1){
+				String action = "";
+				
+				System.out.print(
+					"*****************************************"+
+					"\nReading Session in progress"+
+					"\nReading: "+controller.getProductByPositon(productPosition).getName()+
+					"\nReading page "+controller.getUserByPosition(userPosition).getPagesRead().get(productPosition)+" out of "+controller.getProductByPositon(productPosition).getNumPages()+
+					"\nSelect one option: \nA. Go to the next page \nS. Go to the previous page\nB. Exit\n: "
+				);
+				
 				do{
-					System.out.println("Select one option: \nA. Go to the next page \nS. Go to the previous page\nB. Exit");
-					answer = reader.next();
+					action = reader.nextLine();
+					System.out.println(controller.startReadingSession(userPosition, productPosition, action));
+				}while(!action.equalsIgnoreCase("B"));
 
-
-				}while(answer != "B" );
-				System.out.println("********************************************");
 			}else{
-				System.out.println("We couldn't found the product with the id "+searchedProductID);
+				System.out.println("The user doesn't have the product with the id "+searchedProductID);
 			}
 
-			System.out.println(".................................................");
+			System.out.println("<< --------------------------------------------------------------------- >>");
 		}else{
 			System.out.println("We couldn't found the user with the id "+searchedUserCC);
 
-			System.out.println(".................................................");
+			System.out.println("<< --------------------------------------------------------------------- >>");
 		}
 	}
 
 	//Functional Requeriment 10: Automatically generate objects in the system for each type of user and bibliographic product.
 
 	public void innitTest() {
-		
+		System.out.println(controller.initModel());
 	}
 
 	//Functional Requeriment 11: Generate reports with recorded data
@@ -450,9 +453,8 @@ public class Main {
 	
 		while (!validDate) {
 			// Start a loop while the input date is not valid.
-			System.out.println("The date must follow the format: dd/MM/yyyy");
 			// Display a message indicating the required date format.
-			System.out.print(message); 
+			System.out.print("\n<<The date must follow the format: dd/MM/yyyy\n "+ message); 
 			// Display the custom message passed as an argument.
 			date = reader.nextLine();
 			// Read the date input by the user.

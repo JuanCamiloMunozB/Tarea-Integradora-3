@@ -11,6 +11,7 @@ public abstract class User {
 	private Calendar vinculationDate;
 	protected List<BibliographicProduct> ownedProducts;
 	protected List<Transaction> invoices;
+	protected List<Integer> pagesRead;
 
 	/**
 	 * 
@@ -25,6 +26,7 @@ public abstract class User {
 
 		ownedProducts = new ArrayList<>();
 		invoices = new ArrayList<>();
+		pagesRead = new ArrayList<>();
 	}
 
 	public String getName() {
@@ -39,7 +41,7 @@ public abstract class User {
 		return this.vinculationDate;
 	}
 
-	public List<BibliographicProduct> getBibliograpicProducts() {
+	public List<BibliographicProduct> getOwnedProducts() {
 		return this.ownedProducts;
 	}
 
@@ -47,6 +49,9 @@ public abstract class User {
 		return this.invoices;
 	}
 
+	public List<Integer> getPagesRead(){
+		return this.pagesRead;
+	}
 
 	/**
 	 * 
@@ -54,6 +59,10 @@ public abstract class User {
 	 */
 	public boolean addBibliographicProduct(BibliographicProduct product) {
 		return ownedProducts.add(product);
+	}
+
+	public boolean addPagesRead(int pages){
+		return pagesRead.add(pages);
 	}
 
 	/**

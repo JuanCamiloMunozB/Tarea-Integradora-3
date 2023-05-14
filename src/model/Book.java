@@ -32,6 +32,20 @@ public class Book extends BibliographicProduct {
 		return this.genre;
 	}
 
+	public String getGenreString(){
+		String genre = "";
+		
+		if(this.genre == Genre.SCIENCE_FICTION){
+			genre = "Science Fiction ";
+		}else if(this.genre == Genre.FANTASY){
+			genre = "Fantasy ";
+		}else if(this.genre == Genre.HISTORICAL_NOVEL){
+			genre = "Historical Novel";
+		}
+
+		return genre;
+	}
+	
 	public void setReview(String review) {
 		this.review = review;
 	}

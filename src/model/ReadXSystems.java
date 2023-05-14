@@ -9,10 +9,12 @@ public class ReadXSystems {
 
 	private List<BibliographicProduct> products;
 	private List<User> users;
+	private List<String> productsIdentifiers;
 
 	public ReadXSystems() {
 		products = new ArrayList<>();
 		users = new ArrayList<>();
+		productsIdentifiers = new ArrayList<>();
 	}
 
 	//Functional Requeriment 0: Register Books
@@ -44,7 +46,7 @@ public class ReadXSystems {
 		}
 
 		String id = generateHexIdentifier();// Generate a hexadecimal identifier
-		
+
 		BibliographicProduct book = new Book(id, name, numPages, review, publicationDate, genre, url, price);
 		products.add(book);
 	
@@ -55,18 +57,29 @@ public class ReadXSystems {
 
 	public String generateHexIdentifier(){
 		String identifier = "";
+		boolean isRegistered = false;
 
 		Random random = new Random();
 		StringBuilder sb = new StringBuilder();
 		String hexChars = "0123456789ABCDEF";
 
-		for (int i = 0; i < 3; i++) {
-			int index = random.nextInt(hexChars.length());
-			char character = hexChars.charAt(index);
-			sb.append(character);
-		}
+		do{
+			for (int i = 0; i < 3; i++) {
+				int index = random.nextInt(hexChars.length());
+				char character = hexChars.charAt(index);
+				sb.append(character);
+			}
+			identifier = sb.toString();
 
-		identifier = sb.toString();
+			for(int i = 0; i<productsIdentifiers.size() && isRegistered == false; i++){
+				if(productsIdentifiers.get(i) == identifier){
+					isRegistered = true;
+				}
+			}
+			
+		}while(isRegistered == true);
+
+		productsIdentifiers.add(hexChars);
 
 		return identifier;
 	}
@@ -83,7 +96,7 @@ public class ReadXSystems {
 	 * @param price
 	 * @param periodicityEmission
 	 */
-	public String addMagazine(String name, int numPages, Calendar publicationDate, int categoryOption, String url, Double price, int periodicityEmission) {
+	public String addMagazine(String name, int numPages, Calendar publicationDate, int categoryOption, String url, Double price, String periodicityEmission) {
 		Category category = null;
 
 		switch(categoryOption){
@@ -112,17 +125,28 @@ public class ReadXSystems {
 
 	public String generateAlphaIdentifier(){
 		String identifier = "";
+		boolean isRegistered = false;
 
 		Random random = new Random();
 		StringBuilder sb = new StringBuilder();
 		String alphaChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // Define the characters that can be used
 		
-		for (int i = 0; i < 3; i++) {
-			int index = random.nextInt(alphaChars.length());
-			sb.append(alphaChars.charAt(index)); // Append a random character from the list of possible characters
-		}
+		do{
+			for (int i = 0; i < 3; i++) {
+				int index = random.nextInt(alphaChars.length());
+				sb.append(alphaChars.charAt(index)); // Append a random character from the list of possible characters
+			}
 
-		identifier = sb.toString();
+			identifier = sb.toString();
+
+			for(int i = 0; i<productsIdentifiers.size() && isRegistered == false; i++){
+				if(productsIdentifiers.get(i) == identifier){
+					isRegistered = true;
+				}
+			}
+		}while(isRegistered == true);
+
+		productsIdentifiers.add(identifier);
 
 		return identifier;
 	}
@@ -185,7 +209,7 @@ public class ReadXSystems {
 	 * @param price
 	 * @param periodicityEmission
 	 */
-	public String modifyMagazineInfo(String magazineID, String name, int numPages, Calendar publicationDate, int categoryOption, String url, Double price, int periodicityEmission) {
+	public String modifyMagazineInfo(String magazineID, String name, int numPages, Calendar publicationDate, int categoryOption, String url, Double price, String periodicityEmission) {
 
 		BibliographicProduct magazine = searchBibliographicProductByID(magazineID);
 		
@@ -277,6 +301,7 @@ public class ReadXSystems {
 		Transaction bill = new Transaction(getCurrentDate(), productPrice, purchasedProduct);
 
 		purchaser.addBibliographicProduct(purchasedProduct);
+		purchaser.addPagesRead(0);
 		purchaser.addTransaction(bill);
 		
 		return bill.getTransactionInfo();
@@ -326,60 +351,93 @@ public class ReadXSystems {
 	 * @param action
 	 */
 	public boolean innitReadingSession(String userCC, String productID) { //Incomplete
-		String message = "";
-
 		User user = searchUserByCC(userCC);
 		BibliographicProduct product = user.searchOwnedProductByID(productID);
 
 		if(product != null){
-			message = "Reading: "+product.getName()+"\n";
+			return true;
 		}else{
-			message = "This bibliographic product does not belong to the user";
+			return false;
 		}		
-		
-		return true;
 	}
 
-	//Incomplete
-	public String startReadingSession(BibliographicProduct product, String action){
+	public String startReadingSession(int userPosition, int productPosition, String action){
+		User user = users.get(userPosition);
+		BibliographicProduct product = user.getOwnedProducts().get(productPosition);
+		int startPages = user.getPagesRead().get(productPosition);
+		int maxNumPages = product.getNumPages(); // maximun number of pages
+		int numReadPages = startPages; // number of pages read
+		int countReadPages = startPages; // counter of the readPages 
 
 		String message = "";
-		int numPages = product.getNumPages(); // maximun number of pages
-		int numReadPages = 0; // number of pages read
-		int countReadPages = numReadPages; // counter of the readPages
 
-		switch(action){
-			case "A":
-				if(countReadPages<numPages){
-					if(countReadPages==numReadPages){
-						countReadPages++;
-						numReadPages++;
-					}else{
-						countReadPages++;
-					}
+		if(action.equalsIgnoreCase("A")){
+			if(countReadPages<maxNumPages){
+				if(countReadPages==numReadPages){
+					countReadPages++;
+					numReadPages++;
 				}else{
-					message += "there is no next page to this one. \n";
+					countReadPages++;
 				}
-			break;
-			
-			case "S":
-				if(countReadPages>0){
-					countReadPages--;
-				}else{
-					message += "there is no page before this one. \n";
-				}
-			break;
-
-			case "B":
-				message += "the reading session has ended. \n";
-			break;
+			}else{
+				message += "there is no next page to this one. \n";
+			}
+		}else if(action.equalsIgnoreCase("S")){
+			if(countReadPages>0){
+				countReadPages--;
+			}else{
+				message += "there is no page before this one. \n";
+			}
+		}else{
+			message += "the reading session has ended. \n";
 		}
 
-		product.setReadPages(countReadPages);
+		product.setReadPages(numReadPages);
+		user.getPagesRead().set(userPosition, countReadPages);
+
+		message = 
+		"*****************************************"+
+		"\nReading Session in progress"+
+		"\nReading: "+products.get(productPosition).getName()+
+		"\nReading page "+startPages+" out of "+products.get(productPosition).getNumPages()+
+		"\nSelect one option: \nA. Go to the next page \nS. Go to the previous page\nB. Exit\n: ";
 
 		return message;
 	}
-	
+
+	//Functional Requeriment 10: Automatically generate objects in the system for each type of user and bibliographic product.
+
+	public String initModel(){
+		String message = "";
+
+		Calendar calendar1 = Calendar.getInstance();
+		calendar1.set(1996, 7, 1);
+		Calendar calendar2 = Calendar.getInstance();
+		calendar2.set(2021, 5, 1);
+
+		BibliographicProduct product1 = new Book("4AF", "A Game of Thrones", 694, "join adventures across the seven kingdoms", calendar1, Genre.FANTASY, "AGOT.png", 19.99);
+		BibliographicProduct product2 = new Magazine("ZIT", "Vogue", 40, calendar2,Category.VARIETIES, "LMV2021.jpg", 4.99,"Mensual");
+
+		products.add(product1);
+		products.add(product2);
+
+		User user1 = new Regular("Juan ", "0123456789", getCurrentDate());
+		User user2 = new Premium("Camilo", "9876543210", getCurrentDate());
+
+		users.add(user1);
+		users.add(user2);
+
+		message = "Users and bibliographic products have been created successfully."+
+		"\nproduct test 1: "+product1.getID()+
+		"\nproduct test 2: "+product2.getID()+
+		"\nuser test 1: "+user1.getCC()+
+		"\nuser test 2: "+user2.getCC();
+		
+
+		return message;
+
+	}
+
 	//Functional Requeriment 11: Generate reports with recorded data
 
 	//Other functionalities
@@ -481,6 +539,22 @@ public class ReadXSystems {
 		}
 
 		return usersType;
+	}
+
+	public BibliographicProduct getProductByPositon(int position){
+		return products.get(position);
+	}
+
+	public Book getProductCastedBook(int position){
+		return (Book)products.get(position);
+	}
+
+	public Magazine getProductCastedMagazine(int position){
+		return (Magazine)products.get(position);
+	}
+
+	public User getUserByPosition(int position){
+		return users.get(position);
 	}
 
 }
