@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Random;
 
 public class ReadXSystems {
-
+	public static final int ROW = 5; 
+	public static final int COLUMN = 5;
 	private List<BibliographicProduct> products;
 	private List<User> users;
 	private List<String> productsIdentifiers;
@@ -344,10 +345,64 @@ public class ReadXSystems {
 	 * 
 	 * @param user
 	 */
-	public String showUsersLibrary(User user) {
-		// TODO - implement ReadXSystems.showUsersLibrary
-		throw new UnsupportedOperationException();
+	public String showUsersLibrary(String userCC, int page) {
+		String message = "";
+		User user = searchUserByCC(userCC);
+	
+		if (user != null) {
+			List<BibliographicProduct[][]> library = initLibrary(user);
+			if (page >= 0 && page < library.size()) {
+				BibliographicProduct[][] libraryPage = library.get(page);
+	
+				message += "  |";
+				for (int j = 0; j < COLUMN; j++) {
+					message += "  " + j + "  |";
+				}
+				message += "\n";	
+
+				for (int i = 0; i < ROW; i++) {
+					message += i + " | ";
+					for (int j = 0; j < COLUMN; j++) {
+						if (libraryPage[i][j] != null) {
+							message += libraryPage[i][j].getID() + " | ";
+						} else {
+							message += "___ | ";
+						}
+					}
+					message += "\n";
+				}
+			} else {
+				message = "Invalid page number";
+			}
+		} else {
+			message = "No user has that id";
+		}
+	
+		return message;
 	}
+	
+	public List<BibliographicProduct[][]> initLibrary(User user) {
+		List<BibliographicProduct[][]> library = new ArrayList<>();
+		int index = 0;
+	
+		while (index < user.getOwnedProducts().size()) {
+			BibliographicProduct[][] libraryPage = new BibliographicProduct[ROW][COLUMN];
+			for (int i = 0; i < ROW; i++) {
+				for (int j = 0; j < COLUMN; j++) {
+					if (index < user.getOwnedProducts().size()) {
+						libraryPage[i][j] = user.getOwnedProducts().get(index);
+						index++;
+					} else {
+						break;
+					}
+				}
+			}
+			library.add(libraryPage);
+		}
+	
+		return library;
+	}
+	
 
 	/**
 	 * 
@@ -355,9 +410,22 @@ public class ReadXSystems {
 	 * @param page
 	 * @param action
 	 */
-	public boolean navigateUsersLibrary(String usersLibrary, int page, char action) {
-		// TODO - implement ReadXSystems.navigateUsersLibrary
-		throw new UnsupportedOperationException();
+	public String navigateUsersLibrary(String usersCC, int page, String action) {
+		String message = "";
+
+		if(action.equalsIgnoreCase("a")){
+			page++;
+		}else if(action.equalsIgnoreCase("s")){
+			page--;
+		}else if(action.equalsIgnoreCase("e")){
+			message += "\nreturning to the menu. \n";
+		}else{
+			message += "\nInvalid option. Please, try again.";
+		}
+
+		message = showUsersLibrary(usersCC, page);
+
+		return message;
 	}
 
 	//Functional Requeriment 9: Allow a user to simulate a reading session
@@ -446,6 +514,11 @@ public class ReadXSystems {
 		users.add(user1);
 		users.add(user2);
 
+		user1.addBibliographicProduct(product1);
+		user1.addBibliographicProduct(product2);
+		user2.addBibliographicProduct(product1);
+		user2.addBibliographicProduct(product2);
+
 		message = "Users and bibliographic products have been created successfully."+
 		"\nproduct test 1: "+product1.getID()+
 		"\nproduct test 2: "+product2.getID()+
@@ -458,6 +531,204 @@ public class ReadXSystems {
 	}
 
 	//Functional Requeriment 11: Generate reports with recorded data
+
+	public String getTotalPagesReadByType(){
+		String message = "";
+		int booksReadPages = 0;
+		int magReadPages = 0;
+
+		for(int i = 0; i<products.size(); i++){
+			if(products.get(i) instanceof Book){
+				booksReadPages +=products.get(i).getReadPages();
+			}
+		}
+
+		for(int i = 0; i<products.size(); i++){
+			if(products.get(i) instanceof Magazine){
+				magReadPages +=products.get(i).getReadPages();
+			}
+		}
+
+		message = " -Books total read pages: "+booksReadPages+"\n -Magazines total read pages: "+magReadPages;
+
+		return message;
+	}
+
+	public String getMostReadGenreAndCategory(){
+		String message = "";
+
+		int contScienceFiction = 0;
+		int contFantasy = 0;
+		int contHistoricalNovel = 0;
+
+		int contVarieties = 0;
+		int contDesign = 0;
+		int contScientific = 0;
+		
+		for(int i = 0; i<products.size(); i++){
+			if(products.get(i) instanceof Book){
+				if(((Book)products.get(i)).getGenre() == Genre.SCIENCE_FICTION){
+					contScienceFiction += products.get(i).getReadPages();
+
+				}else if(((Book)products.get(i)).getGenre() == Genre.FANTASY){
+					contFantasy += products.get(i).getReadPages();
+
+				}else{
+					contHistoricalNovel += products.get(i).getReadPages();
+				}
+			}else{
+				if(((Magazine)products.get(i)).getCategory() == Category.VARIETIES){
+					contScienceFiction += products.get(i).getReadPages();
+
+				}else if(((Magazine)products.get(i)).getCategory() == Category.SCIENTIFIC){
+					contFantasy += products.get(i).getReadPages();
+
+				}else{
+					contHistoricalNovel += products.get(i).getReadPages();
+				}
+			}
+		}
+
+		if(contScienceFiction>=contFantasy && contScienceFiction>=contHistoricalNovel){
+			message = " The most read genre is ScienceFiction with: "+ contScienceFiction+ " pages read\n";
+		}else if(contFantasy>=contScienceFiction && contFantasy>=contHistoricalNovel){
+			message = " The most read genre is Fantasy with: "+ contFantasy+ " pages read\n";
+		}else{
+			message = " The most read genre is Historical Novel with: "+ contHistoricalNovel+ " pages read\n";
+		}
+
+		if(contVarieties>=contDesign && contVarieties>=contScientific){
+			message += " The most read category is Varieties with: "+ contVarieties+ " pages read";
+		}else if(contDesign>=contVarieties && contDesign>=contScientific){
+			message += " The most read category is Design with: "+ contDesign+ " pages read";
+		}else{
+			message += " The most read category is Scientific with: "+ contScientific+ " pages read";
+		}
+
+		return message;
+	}
+
+	public String getTop5BookList(){
+		String message = "";
+		List<BibliographicProduct> temp = products;
+		List<BibliographicProduct> top5BookList = new ArrayList<>();
+
+		for (int i = 0; i < 5; i++) {
+			int maxReadBookIndex = 0;
+	
+			for (int j = 1; j < temp.size(); j++) {
+				if (temp.get(j).getReadPages() > temp.get(maxReadBookIndex).getReadPages() && temp.get(i) instanceof Book) {
+					maxReadBookIndex = j;
+				}
+			}
+	
+			top5BookList.add(temp.remove(maxReadBookIndex));
+		}
+
+		for(int i = 0; i<5; i++){
+			message = i+". Name: "+top5BookList.get(i).getName()+"\n "+
+			" Genre: "+((Book)top5BookList.get(i)).getGenreString()+"\n "+
+			" Read pages: "+top5BookList.get(i).getReadPages()+"\n ";
+		}
+
+		return message;
+	}
+
+	public String getTop5MagazinesList(){
+		String message = "";
+		List<BibliographicProduct> temp = products;
+		List<BibliographicProduct> top5MagazineList = new ArrayList<>();
+
+		for (int i = 0; i < 5; i++) {
+			int maxReadMagazineIndex = 0;
+	
+			for (int j = 1; j < temp.size(); j++) {
+				if (temp.get(j).getReadPages() > temp.get(maxReadMagazineIndex).getReadPages() && temp.get(i) instanceof Book) {
+					maxReadMagazineIndex = j;
+				}
+			}
+	
+			top5MagazineList.add(temp.remove(maxReadMagazineIndex));
+		}
+
+		for(int i = 0; i<5; i++){
+			message = i+". Name: "+top5MagazineList.get(i).getName()+"\n "+
+			" Category: "+((Magazine)top5MagazineList.get(i)).getCategoryString()+"\n "+
+			" Read pages: "+top5MagazineList.get(i).getReadPages()+"\n ";
+		}
+
+		return message;
+	}
+
+	public String informSalesByGenre(){
+		String message = "";
+		int scienceFictionSales = 0;
+		Double scienceFictionRevenue = 0.0;
+
+		int fantasySales = 0;
+		Double fantasyRevenue = 0.0;
+
+		int historicalNovelSales = 0;
+		Double historicalNovelRevenue = 0.0;
+
+		for(int i = 0; i<products.size(); i++){
+			if(products.get(i) instanceof Book){
+				if(((Book)products.get(i)).getGenre() == Genre.SCIENCE_FICTION){
+					scienceFictionSales++;
+					scienceFictionRevenue += products.get(i).getPrice()*products.get(i).getSoldCopies();
+
+				}else if(((Book)products.get(i)).getGenre() == Genre.FANTASY){
+					fantasySales++;
+					fantasyRevenue += products.get(i).getPrice()*products.get(i).getSoldCopies();
+				}else{
+					historicalNovelSales++;
+					historicalNovelRevenue += products.get(i).getPrice()*products.get(i).getSoldCopies();
+				}
+			}
+		}
+
+		message = "Genres: \n"+
+		" Science Fiction: \n -Sales: "+scienceFictionSales+"\n -Revenue: "+scienceFictionRevenue+"\n"+
+		" Fantasy: \n -Sales: "+fantasySales+"\n -Revenue: "+fantasyRevenue+"\n"+
+		" Historical Novel: \n -Sales: "+historicalNovelSales+"\n -Revenue: "+historicalNovelRevenue;
+
+		return message;
+	}
+
+	public String informSalesByCategory(){
+		String message = "";
+		int varietiesSales = 0;
+		Double varietiesRevenue = 0.0;
+
+		int designSales = 0;
+		Double designRevenue = 0.0;
+
+		int ScientificSales = 0;
+		Double ScientificRevenue = 0.0;
+
+		for(int i = 0; i<products.size(); i++){
+			if(products.get(i) instanceof Magazine){
+				if(((Magazine)products.get(i)).getCategory() == Category.VARIETIES){
+					varietiesSales++;
+					varietiesRevenue += products.get(i).getPrice()*products.get(i).getSoldCopies();
+
+				}else if(((Magazine)products.get(i)).getCategory() == Category.DESIGN){
+					designSales++;
+					designRevenue += products.get(i).getPrice()*products.get(i).getSoldCopies();
+				}else{
+					ScientificSales++;
+					ScientificRevenue += products.get(i).getPrice()*products.get(i).getSoldCopies();
+				}
+			}
+		}
+
+		message = "Category: \n"+
+		" Science Fiction: \n -Sales: "+varietiesSales+"\n -Revenue: "+varietiesRevenue+"\n"+
+		" Design: \n -Sales: "+designSales+"\n -Revenue: "+designRevenue+"\n"+
+		" Historical Novel: \n -Sales: "+ScientificSales+"\n -Revenue: "+ScientificRevenue;
+
+		return message;
+	}
 
 	//Other functionalities
 	/**

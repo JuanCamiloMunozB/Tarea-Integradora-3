@@ -49,7 +49,7 @@ public class Main {
 			"6. Cancel users subscription to magazine\n"+
 			"7. Present Users Library of Bibliographic Products\n"+
 			"8. Simulate a reading session\n"+
-			"9. Automatically generate objects in the system for each type of user and bibliographic product.\n"+
+			"9. Automatically generate objects in the system for testing.\n"+
 			"10. Generate reports with recorded data\n"+
 			"0. Exit program."
 		);
@@ -347,14 +347,49 @@ public class Main {
 	//Functional Requeriment 8: Present Users Library of Bibliographic Products
 
 	public void navigateUsersLibrary() {
+		int libraryPage = 0;
+
+		System.out.print("<<Type the users cc: ");
+		String searchedUserCC = reader.nextLine();
+
+		System.out.println(controller.showUsersLibrary(searchedUserCC, libraryPage));
 		
-		
+		System.out.println("<<Type what you want to do:\n 1. Navigate library\n 2. Start Reading session\n :");
+		int answer = reader.nextInt();
+
+		switch(answer){
+			case 1:
+				String action;
+
+				do{
+					System.out.println("\nSelect one option: \nA. Go to the next page \nS. Go to the previous page\nE. Exit\n:");
+					action = reader.next();
+
+					if(action.equalsIgnoreCase("a")){
+						libraryPage++;
+					}else if(action.equalsIgnoreCase("s")){
+						libraryPage--;
+					}else if(action.equalsIgnoreCase("e")){
+						System.out.println("\nreturning to the menu. \n");
+					}else{
+						System.out.println("\nInvalid option. Please, try again.");
+					}
+					
+					
+				}while(!action.equalsIgnoreCase("e"));
+
+			break;
+
+			case 2:
+			break;
+		}
+
 	}
 
 	//Functional Requeriment 9: Allow a user to simulate a reading session
 
 	public void simulateReadingSessionByCoordinates(){
-
+		System.out.println("");
 	}
 
 	public void simulateReadingSessionByID(){
@@ -392,12 +427,12 @@ public class Main {
 				System.out.println("The user doesn't have the product with the id "+searchedProductID);
 			}
 
-			System.out.println("<< --------------------------------------------------------------------- >>");
 		}else{
 			System.out.println("We couldn't found the user with the id "+searchedUserCC);
 
-			System.out.println("<< --------------------------------------------------------------------- >>");
 		}
+
+		System.out.println("<< --------------------------------------------------------------------- >>");
 	}
 
 	//Functional Requeriment 10: Automatically generate objects in the system for each type of user and bibliographic product.
@@ -409,6 +444,44 @@ public class Main {
 	//Functional Requeriment 11: Generate reports with recorded data
 
 	public void generateReport(){
+		System.out.println("<< --------------------------------------------------------------------- >>");
+		System.out.println("Which report do you want to generate?");
+		System.out.println("1. Report the total accumulated number of pages read on the entire platform");
+		System.out.println("2. Report the most read book genre and magazine category for the entire platform.");
+		System.out.println("3. Report the Top 5 most read books and Top 5 most read magazines on the platform.");
+		System.out.println("4. Report the number of books sold and total sales value, for each gender");
+		System.out.println("5. Report the number of active subscriptions and the total value paid for subscriptions.");
+
+		int answer = validateOptionInputByRange("", 1, 5);
+
+		switch(answer){
+
+			case 1:
+				System.out.println("Report 1 \n"+controller.getTotalPagesReadByType());
+				
+			break;
+		
+			case 2:
+				System.out.println("Report 2 \n"+controller.getMostReadGenreAndCategory());
+			break;
+
+			case 3:
+				System.out.println("Report 3 \n"+
+				"Top 5 most read books: \n"+ controller.getTop5BookList()+
+				"Top 5 most read magazines: \n"+ controller.getTop5MagazinesList());
+			break;
+
+			case 4:
+				System.out.println("Report 4 \n"+controller.informSalesByGenre());
+			break;
+
+			case 5:
+				System.out.println("Report 5 \n"+controller.informSalesByCategory());
+			break;
+		
+		}
+
+		System.out.println("<< --------------------------------------------------------------------- >>");
 
 	}
 
