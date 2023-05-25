@@ -14,6 +14,7 @@ public class Main {
 	private ReadXSystems controller;
 	private SimpleDateFormat format;
 
+	
 	public Main(){
 		reader = new Scanner(System.in);
 		controller = new ReadXSystems();
@@ -347,50 +348,78 @@ public class Main {
 	//Functional Requeriment 8: Present Users Library of Bibliographic Products
 
 	public void navigateUsersLibrary() {
-		int libraryPage = 0;
+		int libraryShelve = 0;
 
 		System.out.print("<<Type the users cc: ");
 		String searchedUserCC = reader.nextLine();
 
-		System.out.println(controller.showUsersLibrary(searchedUserCC, libraryPage));
-		
-		System.out.println("<<Type what you want to do:\n 1. Navigate library\n 2. Start Reading session\n :");
-		int answer = reader.nextInt();
+		int userPosition = controller.searchUserArrayPosition(searchedUserCC);
 
-		switch(answer){
-			case 1:
-				String action;
+		if(userPosition != -1){
 
-				do{
-					System.out.println("\nSelect one option: \nA. Go to the next page \nS. Go to the previous page\nE. Exit\n:");
-					action = reader.next();
+			System.out.println(controller.showUsersLibrary(searchedUserCC, libraryShelve));
+			
+			System.out.print("<<Type what you want to do:\n 1. Navigate library\n 2. Start Reading session\n :");
+			int answer = reader.nextInt();
 
-					if(action.equalsIgnoreCase("a")){
-						libraryPage++;
-					}else if(action.equalsIgnoreCase("s")){
-						libraryPage--;
-					}else if(action.equalsIgnoreCase("e")){
-						System.out.println("\nreturning to the menu. \n");
-					}else{
-						System.out.println("\nInvalid option. Please, try again.");
-					}
-					
-					
-				}while(!action.equalsIgnoreCase("e"));
+			switch(answer){
+				case 1:
+					String action;
 
-			break;
+					do{
+						System.out.println("\nSelect one option: \nA. Go to the next page \nS. Go to the previous page\nE. Exit\n:");
+						action = reader.next();
 
-			case 2:
-			break;
+						if(action.equalsIgnoreCase("a")){
+							libraryShelve++;
+						}else if(action.equalsIgnoreCase("s")){
+							libraryShelve--;
+						}
+
+						String message = controller.showUsersLibrary(searchedUserCC, libraryShelve);
+
+						if(message.equals("Invalid page number")){
+							if(libraryShelve<0){
+								libraryShelve++;
+							}else{
+								libraryShelve--;
+							}
+						}
+
+						System.out.println(message);
+						// action es igual a leer 
+						// crear variable con la página 
+						// ejecutar metodo controlador 
+						// aumentar la variable de la página 
+						// 
+						
+					}while(!action.equalsIgnoreCase("e"));
+
+				break;
+
+				case 2:
+					System.out.println(controller.showUsersLibrary(searchedUserCC, libraryShelve));
+					System.out.println("Enter the coordinate x: ");
+					int x = reader.nextInt();
+					System.out.println("Enter the coordinate y: ");
+					int y = reader.nextInt();
+
+					int productPosition = controller.getProductPositionByCoordinates(x, y, libraryShelve, userPosition);
+
+					do{
+						action = reader.next();
+						System.out.print(controller.startReadingSession(userPosition, productPosition, action));
+					}while(!action.equalsIgnoreCase("B"));					
+
+				break;
+			}
+		}else{
+			System.out.println("No user has that id");
 		}
 
 	}
 
 	//Functional Requeriment 9: Allow a user to simulate a reading session
-
-	public void simulateReadingSessionByCoordinates(){
-		System.out.println("");
-	}
 
 	public void simulateReadingSessionByID(){
 
@@ -619,3 +648,16 @@ public class Main {
 		return option;
 	}
 }
+
+	/*
+	 * TASKS TO COMPLETE:
+	 * - Complete code implementation
+	 * - Check code implementation
+	 * - javadoc
+	 * - Complete requierement analysis
+	 * - Complete traceability table
+	 * - Check requierement analysis
+	 * - Check traceability table
+	 * - Complete Class Diagram
+	 * - Make program execution video
+	 */

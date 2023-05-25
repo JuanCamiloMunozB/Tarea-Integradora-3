@@ -345,38 +345,38 @@ public class ReadXSystems {
 	 * 
 	 * @param user
 	 */
-	public String showUsersLibrary(String userCC, int page) {
+	public String showUsersLibrary(String userCC, int shelve) {
 		String message = "";
 		User user = searchUserByCC(userCC);
-	
-		if (user != null) {
-			List<BibliographicProduct[][]> library = initLibrary(user);
-			if (page >= 0 && page < library.size()) {
-				BibliographicProduct[][] libraryPage = library.get(page);
-	
-				message += "  |";
-				for (int j = 0; j < COLUMN; j++) {
-					message += "  " + j + "  |";
-				}
-				message += "\n";	
+		List<BibliographicProduct[][]> library = initLibrary(user);
+		
+		if (shelve >= 0 && shelve < library.size()) {
+			BibliographicProduct[][] libraryShelve = library.get(shelve);
 
-				for (int i = 0; i < ROW; i++) {
-					message += i + " | ";
-					for (int j = 0; j < COLUMN; j++) {
-						if (libraryPage[i][j] != null) {
-							message += libraryPage[i][j].getID() + " | ";
-						} else {
-							message += "___ | ";
-						}
+			message = "shelve "+shelve+" out of"+library.size()+"\n";
+
+			message += "  |";
+			for (int j = 0; j < COLUMN; j++) {
+				message += "  " + j + "  |";
+			}
+			message += "\n";	
+
+			for (int i = 0; i < ROW; i++) {
+				message += i + " | ";
+				for (int j = 0; j < COLUMN; j++) {
+					if (libraryShelve[i][j] != null) {
+						message += libraryShelve[i][j].getID() + " | ";
+					} else {
+						message += "___ | ";
 					}
-					message += "\n";
 				}
-			} else {
-				message = "Invalid page number";
+				message += "\n";
 			}
 		} else {
-			message = "No user has that id";
-		}
+			message = "Invalid page number";
+			
+			}
+		
 	
 		return message;
 	}
@@ -386,64 +386,30 @@ public class ReadXSystems {
 		int index = 0;
 	
 		while (index < user.getOwnedProducts().size()) {
-			BibliographicProduct[][] libraryPage = new BibliographicProduct[ROW][COLUMN];
+			BibliographicProduct[][] shelve = new BibliographicProduct[ROW][COLUMN];
 			for (int i = 0; i < ROW; i++) {
 				for (int j = 0; j < COLUMN; j++) {
 					if (index < user.getOwnedProducts().size()) {
-						libraryPage[i][j] = user.getOwnedProducts().get(index);
+						shelve[i][j] = user.getOwnedProducts().get(index);
 						index++;
 					} else {
 						break;
 					}
 				}
 			}
-			library.add(libraryPage);
+			library.add(shelve);
 		}
 	
 		return library;
 	}
-	
-
-	/**
-	 * 
-	 * @param usersLibrary
-	 * @param page
-	 * @param action
-	 */
-	public String navigateUsersLibrary(String usersCC, int page, String action) {
-		String message = "";
-
-		if(action.equalsIgnoreCase("a")){
-			page++;
-		}else if(action.equalsIgnoreCase("s")){
-			page--;
-		}else if(action.equalsIgnoreCase("e")){
-			message += "\nreturning to the menu. \n";
-		}else{
-			message += "\nInvalid option. Please, try again.";
-		}
-
-		message = showUsersLibrary(usersCC, page);
-
-		return message;
-	}
 
 	//Functional Requeriment 9: Allow a user to simulate a reading session
-
-	/**
-	 * 
-	 * @param bibliographicProduct
-	 * @param action
-	 */
-	public boolean innitReadingSession(String userCC, String productID) { //Incomplete
-		User user = searchUserByCC(userCC);
-		BibliographicProduct product = user.searchOwnedProductByID(productID);
-
-		if(product != null){
-			return true;
-		}else{
-			return false;
-		}		
+	
+	public int getProductPositionByCoordinates(int x, int y, int shelve, int userPosition){
+		User user = users.get(userPosition);
+		List<BibliographicProduct[][]> library = initLibrary(user);
+		BibliographicProduct searchedProduct = library.get(shelve)[x][y];
+		return user.getOwnedProducts().indexOf(searchedProduct);	
 	}
 
 	public String startReadingSession(int userPosition, int productPosition, String action){
@@ -647,7 +613,6 @@ public class ReadXSystems {
 					maxReadMagazineIndex = j;
 				}
 			}
-	
 			top5MagazineList.add(temp.remove(maxReadMagazineIndex));
 		}
 

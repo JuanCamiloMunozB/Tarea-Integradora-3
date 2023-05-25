@@ -2,7 +2,7 @@ package model;
 
 import java.util.Calendar;
 
-public class Regular extends User {
+public class Regular extends User implements Advertisable{
 
 	/**
 	 * 
