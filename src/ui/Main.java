@@ -18,8 +18,7 @@ public class Main {
 	public Main(){
 		reader = new Scanner(System.in);
 		controller = new ReadXSystems();
-		//test = new Test();
-		format = new SimpleDateFormat("dd/M/yy");
+		format = new SimpleDateFormat("dd/M/yy"); 
 	}
 
 	public static void main(String[] args){
@@ -143,8 +142,6 @@ public class Main {
 				
 				System.out.println(controller.addBook(name, numPages, review, publicationDate, genreOption, url, price));
 
-				System.out.println("<< --------------------------------------------------------------------- >>");
-
 			break;
 
 			case 2:
@@ -156,10 +153,12 @@ public class Main {
 
 				System.out.println(controller.addMagazine(name, numPages, publicationDate, categoryOption, url, price, periodicityEmission));
 
-				System.out.println("<< --------------------------------------------------------------------- >>");
+				
 			break;
 
 		}
+
+		System.out.println("<< --------------------------------------------------------------------- >>");
 		
 	}
 
@@ -200,8 +199,6 @@ public class Main {
 				System.out.println("\nCurrent genre: "+controller.getProductCastedBook(searchedProductPosition).getGenreString()+"Avilable book's genres:\n1.Science fiction\n2.Fantasy\n3.Historical novel");
 				int genreOption = validateOptionInputByRange("<<Select the genre: ", 1, 3);
 
-				System.out.println("<< --------------------------------------------------------------------- >>");
-
 				System.out.println(controller.modifyBookInfo(searchedProductID, name, numPages, review, publicationDate, genreOption, url, price));
 
 			}else if(searchedProductType == 1){	
@@ -211,15 +208,13 @@ public class Main {
 				System.out.println("\nCurrent category: "+controller.getProductCastedMagazine(searchedProductPosition).getCategoryString()+"Avilable magazines's categories:\n1.Varieties\n2.Design\n3.Scientific");
 				int categoryOption = validateOptionInputByRange("<<Select the category: ", 1, 3);
 
-				System.out.println("<< --------------------------------------------------------------------- >>");
-
 				System.out.println(controller.modifyMagazineInfo(searchedProductID, name, numPages, publicationDate, categoryOption, url, price, periodicityEmission));
 			}				
 		}else{
 			System.out.println("We couldn't found the product with the id "+searchedProductID);
-
-			System.out.println("<< --------------------------------------------------------------------- >>");
 		}
+
+		System.out.println("<< --------------------------------------------------------------------- >>");
 	}
 
 	//Functional Requeriment 4: Eliminate BibliographicProducts
@@ -234,14 +229,10 @@ public class Main {
 
 		if(isProductRemoved){
 			System.out.println("The product has been removed. ");
-
-			System.out.println("<< --------------------------------------------------------------------- >>");
 		}else{
 			System.out.println("We couldn't found the product with the id "+searchedProductID);
-
-			System.out.println("<< --------------------------------------------------------------------- >>");
 		}
-		
+		System.out.println("<< --------------------------------------------------------------------- >>");
 	}
 
 	//Functional Requeriment 5: Register regular and premimum users
@@ -260,11 +251,11 @@ public class Main {
 
 		switch(userOption){
 			case 1:
-			System.out.println(controller.addRegularUser(name, cc));
+				System.out.println(controller.addRegularUser(name, cc));
 			break;
 
 			case 2:
-			System.out.println(controller.addPremiumUser(name, cc));
+				System.out.println(controller.addPremiumUser(name, cc));
 			break;
 		}
 
@@ -295,12 +286,11 @@ public class Main {
 				System.out.println("We couldn't found the product with the id "+searchedProductID);
 			}			
 
-			System.out.println("<< --------------------------------------------------------------------- >>");
 		}else{
 			System.out.println("We couldn't found the user with the id "+searchedUserCC);
-
-			System.out.println("<< --------------------------------------------------------------------- >>");
 		}
+
+		System.out.println("<< --------------------------------------------------------------------- >>");
 		
 	}
 
@@ -335,20 +325,16 @@ public class Main {
 				System.out.println("The suscription to the magazine was canceled. ");
 				break;
 			}
-
-			System.out.println("<< --------------------------------------------------------------------- >>");
 		}else{
 			System.out.println("We couldn't found the user with the id "+searchedUserCC);
-
-			System.out.println("<< --------------------------------------------------------------------- >>");
 		}
-		
+		System.out.println("<< --------------------------------------------------------------------- >>");
 	}
 
 	//Functional Requeriment 8: Present Users Library of Bibliographic Products
 
 	public void navigateUsersLibrary() {
-		int libraryShelve = 0;
+		System.out.println("<< --------------------------------------------------------------------- >>");
 
 		System.out.print("<<Type the users cc: ");
 		String searchedUserCC = reader.nextLine();
@@ -356,66 +342,83 @@ public class Main {
 		int userPosition = controller.searchUserArrayPosition(searchedUserCC);
 
 		if(userPosition != -1){
-
-			System.out.println(controller.showUsersLibrary(searchedUserCC, libraryShelve));
+			int libraryShelve = 0;
+			int answer;
 			
-			System.out.print("<<Type what you want to do:\n 1. Navigate library\n 2. Start Reading session\n :");
-			int answer = reader.nextInt();
+			do{
+				System.out.print("<<Type what you want to do:\n 1. Navigate library\n 2. Start Reading session\n 3. Return to Main Menu\n");
+				answer = validateOptionInputByRange(": ", 1, 3);
 
-			switch(answer){
-				case 1:
-					String action;
+				switch(answer){
+					case 1:
+						String action;
 
-					do{
-						System.out.println("\nSelect one option: \nA. Go to the next page \nS. Go to the previous page\nE. Exit\n:");
-						action = reader.next();
+						System.out.println(controller.showUsersLibrary(searchedUserCC, libraryShelve));
 
-						if(action.equalsIgnoreCase("a")){
-							libraryShelve++;
-						}else if(action.equalsIgnoreCase("s")){
-							libraryShelve--;
-						}
+						do{
+							System.out.print("\nSelect one option: \nA. Go to the next page \nS. Go to the previous page\nE. Exit\n: ");
+							action = reader.next();
 
-						String message = controller.showUsersLibrary(searchedUserCC, libraryShelve);
-
-						if(message.equals("Invalid page number")){
-							if(libraryShelve<0){
-								libraryShelve++;
+							if(action.equalsIgnoreCase("e")){
+								System.out.println("Returning to the menu");
 							}else{
-								libraryShelve--;
+
+								if(action.equalsIgnoreCase("a")){
+									libraryShelve++;
+								}else if(action.equalsIgnoreCase("s")){
+									libraryShelve--;
+								}
+
+								String message = controller.showUsersLibrary(searchedUserCC, libraryShelve);
+
+								if(message.equals("Invalid page number")){
+									if(libraryShelve<0){
+										libraryShelve++;
+									}else{
+										libraryShelve--;
+									}
+								}
+								System.out.println(message);
 							}
+
+							System.out.println("<<------------------------------------>>");
+
+						}while(!action.equalsIgnoreCase("e"));
+
+					break;
+
+					case 2:
+						System.out.println(controller.showUsersLibrary(searchedUserCC, libraryShelve));
+						System.out.print("Enter the coordinate x");
+						int x = validateInteger(": ");
+						System.out.print("Enter the coordinate y");
+						int y = validateInteger(": ");
+
+						int productPosition = controller.getProductPositionByCoordinates(x, y, libraryShelve, userPosition);
+
+						if(productPosition != -1){
+							do{
+								System.out.print(controller.showReadingSession(userPosition, libraryShelve));
+								action = reader.next();
+								System.out.print(controller.changePage(userPosition, productPosition, action));
+							}while(!action.equalsIgnoreCase("B"));
+
+						}else{
+							System.out.println("There is no product in that coordinates");
 						}
 
-						System.out.println(message);
-						// action es igual a leer 
-						// crear variable con la página 
-						// ejecutar metodo controlador 
-						// aumentar la variable de la página 
-						// 
-						
-					}while(!action.equalsIgnoreCase("e"));
+					break;
 
-				break;
-
-				case 2:
-					System.out.println(controller.showUsersLibrary(searchedUserCC, libraryShelve));
-					System.out.println("Enter the coordinate x: ");
-					int x = reader.nextInt();
-					System.out.println("Enter the coordinate y: ");
-					int y = reader.nextInt();
-
-					int productPosition = controller.getProductPositionByCoordinates(x, y, libraryShelve, userPosition);
-
-					do{
-						action = reader.next();
-						System.out.print(controller.startReadingSession(userPosition, productPosition, action));
-					}while(!action.equalsIgnoreCase("B"));					
-
-				break;
-			}
+					case 3:
+						System.out.println("Returning to the main menu..");
+					break;
+				}
+			}while(answer != 3);
 		}else{
 			System.out.println("No user has that id");
 		}
+
+		System.out.println("<< --------------------------------------------------------------------- >>");
 
 	}
 
@@ -439,17 +442,10 @@ public class Main {
 			if(productPosition != -1){
 				String action = "";
 				
-				System.out.print(
-					"*****************************************"+
-					"\nReading Session in progress"+
-					"\nReading: "+controller.getUserByPosition(userPosition).getOwnedProducts().get(productPosition).getName()+
-					"\nReading page "+controller.getUserByPosition(userPosition).getPagesRead().get(productPosition)+" out of "+controller.getUserByPosition(userPosition).getOwnedProducts().get(productPosition).getNumPages()+
-					"\nSelect one option: \nA. Go to the next page \nS. Go to the previous page\nB. Exit\n: "
-				);
-				
 				do{
+					System.out.print(controller.showReadingSession(userPosition, productPosition));
 					action = reader.next();
-					System.out.print(controller.startReadingSession(userPosition, productPosition, action));
+					System.out.print(controller.changePage(userPosition, productPosition, action));
 				}while(!action.equalsIgnoreCase("B"));
 
 			}else{

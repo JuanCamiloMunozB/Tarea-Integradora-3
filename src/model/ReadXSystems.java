@@ -119,7 +119,7 @@ public class ReadXSystems {
 		BibliographicProduct magazine = new Magazine(id, name, numPages, publicationDate, category, url, price, periodicityEmission);
 		products.add(magazine);
 
-		String message = "the product has been successfully registered. Here is its identifier: "+id;;
+		String message = "the product has been successfully registered. Here is its identifier: "+id;
 
 		return message;
 	}
@@ -353,7 +353,7 @@ public class ReadXSystems {
 		if (shelve >= 0 && shelve < library.size()) {
 			BibliographicProduct[][] libraryShelve = library.get(shelve);
 
-			message = "shelve "+shelve+" out of"+library.size()+"\n";
+			message = "shelve "+ ++shelve +" out of "+library.size()+"\n";
 
 			message += "  |";
 			for (int j = 0; j < COLUMN; j++) {
@@ -374,10 +374,8 @@ public class ReadXSystems {
 			}
 		} else {
 			message = "Invalid page number";
-			
-			}
+		}
 		
-	
 		return message;
 	}
 	
@@ -409,10 +407,21 @@ public class ReadXSystems {
 		User user = users.get(userPosition);
 		List<BibliographicProduct[][]> library = initLibrary(user);
 		BibliographicProduct searchedProduct = library.get(shelve)[x][y];
-		return user.getOwnedProducts().indexOf(searchedProduct);	
+		return user.getOwnedProducts().indexOf(searchedProduct);
 	}
 
-	public String startReadingSession(int userPosition, int productPosition, String action){
+	public String showReadingSession(int userPosition, int productPosition){
+		User user = users.get(userPosition);
+
+		return "<<------------------------------------>>"+
+		"\nReading Session in progress"+
+		"\nReading: "+user.getOwnedProducts().get(productPosition).getName()+
+		"\nReading page "+user.getPagesRead().get(productPosition)+" out of "+user.getOwnedProducts().get(productPosition).getNumPages()+
+		"\nA. Go to the next page \nS. Go to the previous page\nB. Exit\n"+
+		"<<------------------------------------>>\nSelect one option: ";
+	}
+
+	public String changePage(int userPosition, int productPosition, String action){
 		User user = users.get(userPosition);
 		BibliographicProduct product = user.getOwnedProducts().get(productPosition);
 		int startPages = user.getPagesRead().get(productPosition); // the page where the user left
@@ -442,18 +451,11 @@ public class ReadXSystems {
 		}else if(action.equalsIgnoreCase("b")){
 			message += "\nthe reading session has ended. \n";
 		}else{
-			message += "\nInvalid option. Please, try again.";
+			message += "\nInvalid option. Please, try again.\n";
 		}
 
 		product.setReadPages(product.getReadPages()+numReadPages);
 		user.getPagesRead().set(productPosition, countReadPages);
-
-		message += 
-		"*****************************************"+
-		"\nReading Session in progress"+
-		"\nReading: "+products.get(productPosition).getName()+
-		"\nReading page "+countReadPages+" out of "+products.get(productPosition).getNumPages()+
-		"\nSelect one option: \nA. Go to the next page \nS. Go to the previous page\nB. Exit\n: ";
 
 		return message;
 	}
@@ -461,39 +463,97 @@ public class ReadXSystems {
 	//Functional Requeriment 10: Automatically generate objects in the system for each type of user and bibliographic product.
 
 	public String initModel(){
-		String message = "";
+		Random random = new Random();
 
-		Calendar calendar1 = Calendar.getInstance();
-		calendar1.set(1996, 7, 1);
-		Calendar calendar2 = Calendar.getInstance();
-		calendar2.set(2021, 5, 1);
+		int pInitialSize = products.size();
+		int uInitialSize = users.size();
+		int numberOfProducts = 30;
+		int numberOfUsers = 10;
 
-		BibliographicProduct product1 = new Book(generateHexIdentifier(), "A Game of Thrones", 694, "join adventures across the seven kingdoms", calendar1, Genre.FANTASY, "AGOT.png", 19.99);
-		BibliographicProduct product2 = new Magazine(generateAlphaIdentifier(), "Vogue", 40, calendar2,Category.VARIETIES, "LMV2021.jpg", 4.99,"Mensual");
+		for(int i = 0; i<numberOfProducts; i++){
+			int randomNumber = random.nextInt(3) + 1;
+			Genre genre = null;
 
-		products.add(product1);
-		products.add(product2);
+			switch(randomNumber){
+				case 1:
+					genre = Genre.SCIENCE_FICTION;
+				break;
 
-		User user1 = new Regular("Juan ", "0123456789", getCurrentDate());
-		User user2 = new Premium("Camilo", "9876543210", getCurrentDate());
+				case 2:
+					genre = Genre.FANTASY;
+				break;
 
-		users.add(user1);
-		users.add(user2);
+				case 3:
+					genre = Genre.HISTORICAL_NOVEL;
+				break;
+			}
 
-		user1.addBibliographicProduct(product1);
-		user1.addBibliographicProduct(product2);
-		user2.addBibliographicProduct(product1);
-		user2.addBibliographicProduct(product2);
+			int pNumber = products.size()+1;
 
-		message = "Users and bibliographic products have been created successfully."+
-		"\nproduct test 1: "+product1.getID()+
-		"\nproduct test 2: "+product2.getID()+
-		"\nuser test 1: "+user1.getCC()+
-		"\nuser test 2: "+user2.getCC();
-		
+			BibliographicProduct book = new Book(generateHexIdentifier(), "book"+pNumber, i, "", getCurrentDate(), genre, "book"+pNumber+".jpg", 15.0);
+			products.add(book);
+		}
+
+		for(int i = 0; i<numberOfProducts; i++){
+			int randomNumber = random.nextInt(3) + 1;
+			Category category = null;
+
+			switch(randomNumber){
+				case 1:
+					category = Category.VARIETIES;
+				break;
+
+				case 2:
+					category = Category.DESIGN;
+				break;
+
+				case 3:
+					category = Category.SCIENTIFIC;
+				break;
+			}
+
+			int pNumber = products.size()+1;
+
+			Magazine magazine = new Magazine(generateAlphaIdentifier(), "magazine"+pNumber, i, getCurrentDate(), category, "magazine"+pNumber, 15.0, "Every month");
+			products.add(magazine);
+		}
+
+		for(int i = 0; i<numberOfUsers; i++){
+			int uNumber = users.size()+1;
+			User regularUser = new Regular("user"+uNumber, "ut"+uNumber, getCurrentDate());
+			users.add(regularUser);
+		}
+
+		for(int i = 0; i<numberOfUsers; i++){
+			int uNumber = users.size()+1;
+			User premiumUser = new Premium("user"+uNumber, "ut"+uNumber, getCurrentDate());
+			users.add(premiumUser);
+		}
+
+		int randomUserPos = uInitialSize + random.nextInt(numberOfUsers) + 1;
+
+		for(int i = pInitialSize; i<products.size(); i++){
+			users.get(randomUserPos).addBibliographicProduct(products.get(i));
+		}
+
+		String message = "\n<<-PRODUCTS ID-------------------------------------------------------------------------->>\n";
+
+		for (int i = pInitialSize; i<products.size(); i++) {
+			message += " | "+products.get(i).getID()+" | ";
+		}
+
+		message += "\n<<-USERS-------------------------------------------------------------------------------->>\n";
+
+		for (int i = uInitialSize; i<users.size(); i++) {
+			message += " | "+ users.get(i).getCC()+" |";
+		}		
+
+		message += "\n<<-------------------------------------------------------------------------------------->>\n"+
+		"Random user that acquiere every product generated before: "+users.get(randomUserPos).getCC()+
+		"\n<<-------------------------------------------------------------------------------------->>\n";
+
 
 		return message;
-
 	}
 
 	//Functional Requeriment 11: Generate reports with recorded data
@@ -696,6 +756,7 @@ public class ReadXSystems {
 	}
 
 	//Other functionalities
+
 	/**
 	 * 
 	 * @param productID
