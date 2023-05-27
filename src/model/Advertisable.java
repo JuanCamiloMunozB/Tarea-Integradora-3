@@ -2,8 +2,15 @@ package model;
 
 import java.util.Random;
 
+/**
+ * The Advertisable interface represents an an entity to which advertisements may be shown.
+ */
 public interface Advertisable {
     
+    /**
+     * Generates a random advertisement.
+     * @return The generated advertisement as a string.
+     */
     public default String generateAdvertisement(){
         String addString = "";
         Random random = new Random();

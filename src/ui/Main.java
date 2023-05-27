@@ -8,19 +8,40 @@ import java.text.ParseException;
 
 import model.ReadXSystems;
 
+/**
+ * The Main class represents the main entry point of the application. It provides a command-line interface
+ * for interacting with the ReadXSystems library system.
+ */
 public class Main {
 
+	/**
+     * the scanner of the users input.
+     */
 	private Scanner reader;
+
+	/**
+     * the call of the controller class.
+     */
 	private ReadXSystems controller;
+
+	/**
+	 * The date formatter for formatting dates.
+	 */
 	private SimpleDateFormat format;
 
-	
+	/**
+	 * Constructs a new Main object. Initializes the Scanner for user input, the ReadXSystems controller, and the SimpleDateFormat for date formatting.
+	 */
 	public Main(){
 		reader = new Scanner(System.in);
 		controller = new ReadXSystems();
 		format = new SimpleDateFormat("dd/M/yy"); 
 	}
 
+	/**
+	 * The main method is the entry point of the application. It creates an instance of the Main class and starts the menu loop.
+	 * @param args Command line arguments
+	*/
 	public static void main(String[] args){
 		Main exe = new Main();
 		int answer; 
@@ -35,6 +56,9 @@ public class Main {
 		exe.reader.close();
 	}
 
+	/**
+	 * Prints the main menu options to the console.
+	 * */
 	public void printMenu() {
 		System.out.println(
 			"\n" +
@@ -56,6 +80,10 @@ public class Main {
 		);
 	}
 
+	/**
+	 * Executes the selected option from the main menu.
+	 * @param selectedOption The selected option
+	 */
 	public void executeOption(int selectedOption){
 		switch(selectedOption){
 			case 0:
@@ -95,7 +123,7 @@ public class Main {
 			break;
 
 			case 9:
-				innitTest();
+				initTest();
 			break;
 
 			case 10: 
@@ -111,6 +139,9 @@ public class Main {
 	//Functional Requeriment 0: Register Books
 	//Functional Requeriment 1: Register Magazines
 
+	/**
+	 * Registers a new bibliographic product based on user input.
+	 */
 	public void registerBibliographicProduct() {
 
 		System.out.println("<< --------------------------------------------------------------------- >>");
@@ -126,7 +157,6 @@ public class Main {
 		String url = reader.nextLine();
 		
 		Double price = validateDouble("\n<<Type the price of the product: ");
-	
 
 		System.out.println("\nAvailable bibliographic products:\n 1. Books \n 2. Magazine");
 		int typeOption = validateOptionInputByRange(" <<Select product's type: ", 1, 2);
@@ -166,6 +196,9 @@ public class Main {
 	//Functional Requeriment 2: Modify Books information
 	//Functional Requeriment 3: Modify Magazines information
 
+	/**
+	 * Modifies the information of a bibliographic product based on user input
+	 */
 	public void modifyBibliographicProductInfo() {
 
 		System.out.println("<< --------------------------------------------------------------------- >>");
@@ -173,7 +206,7 @@ public class Main {
 		System.out.print("\n<<Type the identifier of the product you want to search: ");
 		String searchedProductID = reader.next();
 
-		int searchedProductPosition = controller.searchUserArrayPosition(searchedProductID);
+		int searchedProductPosition = controller.searchBibliographicProductArrayPosition(searchedProductID);
 
 		if(searchedProductPosition != -1){
 			int searchedProductType = controller.checkProductType(searchedProductID);
@@ -200,7 +233,7 @@ public class Main {
 				System.out.println("\nCurrent genre: "+controller.getProductCastedBook(searchedProductPosition).getGenreString()+"Avilable book's genres:\n1.Science fiction\n2.Fantasy\n3.Historical novel");
 				int genreOption = validateOptionInputByRange("<<Select the genre: ", 1, 3);
 
-				System.out.println(controller.modifyBookInfo(searchedProductID, name, numPages, review, publicationDate, genreOption, url, price));
+				System.out.println(controller.modifyBookInfo(searchedProductPosition, name, numPages, review, publicationDate, genreOption, url, price));
 
 			}else if(searchedProductType == 1){	
 				System.out.print("\nCurrent periodicity emission: "+controller.getProductCastedMagazine(searchedProductPosition).getPeriodicityEmission()+"<<Type the emission periodicity");
@@ -209,7 +242,7 @@ public class Main {
 				System.out.println("\nCurrent category: "+controller.getProductCastedMagazine(searchedProductPosition).getCategoryString()+"Avilable magazines's categories:\n1.Varieties\n2.Design\n3.Scientific");
 				int categoryOption = validateOptionInputByRange("<<Select the category: ", 1, 3);
 
-				System.out.println(controller.modifyMagazineInfo(searchedProductID, name, numPages, publicationDate, categoryOption, url, price, periodicityEmission));
+				System.out.println(controller.modifyMagazineInfo(searchedProductPosition, name, numPages, publicationDate, categoryOption, url, price, periodicityEmission));
 			}				
 		}else{
 			System.out.println("We couldn't found the product with the id "+searchedProductID);
@@ -220,6 +253,9 @@ public class Main {
 
 	//Functional Requeriment 4: Eliminate BibliographicProducts
 	
+	/**
+	 * Removes a bibliographic product from the system based on user input.
+	 */
 	public void eliminateBibliographicProduct() {
 		System.out.println("<< --------------------------------------------------------------------- >>");
 
@@ -238,26 +274,33 @@ public class Main {
 
 	//Functional Requeriment 5: Register regular and premimum users
 
+	/**
+	 * Registers a new user based on user input.
+	 */
 	public void registerUser() {
 		System.out.println("<< --------------------------------------------------------------------- >>");
 		
 		System.out.print("Available types of user:\n1. Regular \n2. Premium");
 		int userOption = validateOptionInputByRange("\n<<Select the type of user you want: ",1,2);
 
-		System.out.print("\n<<Type your complete name: ");
+		System.out.print("\n<<Type user's complete name: ");
 		String name = reader.nextLine();
 
-		System.out.print("\n<<Type your cc: ");
+		System.out.print("\n<<Type user's cc: ");
 		String cc = reader.nextLine();
 
-		switch(userOption){
-			case 1:
-				System.out.println(controller.addRegularUser(name, cc));
-			break;
-
-			case 2:
-				System.out.println(controller.addPremiumUser(name, cc));
-			break;
+		if(!controller.isCCAlreadyRegistered(cc)){
+			switch(userOption){
+				case 1:
+					System.out.println(controller.addRegularUser(name, cc));
+				break;
+	
+				case 2:
+					System.out.println(controller.addPremiumUser(name, cc));
+				break;
+			}
+		}else{
+			System.out.println("The cc is already registered.");
 		}
 
 		System.out.print("<< --------------------------------------------------------------------- >>");
@@ -265,7 +308,9 @@ public class Main {
 
 	//Functional Requeriment 6: Allow a user to purchase a book and subscribe to a magazine.
 	
-	//Incomplete: validate if user can buy more products or magazines
+	/**
+	 * Performs a transaction for a user to purchase a book or subscribe to a magazine.
+	 */
 	public void makeTransaction() {
 		System.out.println("<< --------------------------------------------------------------------- >>");
 
@@ -275,14 +320,14 @@ public class Main {
 		int searchedUserType = controller.checkUserType(searchedUserCC);
 
 		if(searchedUserType != -1){
-			System.out.print("\n<<Type the identifier of the product you want to search: ");
+			System.out.print("\n<<Type the identifier of the product you want: ");
 			String searchedProductID = reader.nextLine();
 
 			int searchedProductType = controller.checkProductType(searchedProductID);
 
 			if(searchedProductType != -1){
 				System.out.println("\nType the amount you will pay with");
-				Double paidAmount = validateDouble(searchedProductID);
+				Double paidAmount = validateDouble(": ");
 				System.out.println(controller.addBibliographicProductToUser(searchedUserCC, searchedProductID,paidAmount));
 			}else{
 				System.out.println("We couldn't found the product with the id "+searchedProductID);
@@ -296,8 +341,11 @@ public class Main {
 		
 	}
 
-	//Functional Requeriment 7: Allow a user to unsubscribe from a magazine.
+	//Functional Requeriment 7: Allow a user to cancel magazine subscription.
 
+	/**
+	 * Cancels a magazine subscription for a user based on user input.
+	 */
 	public void cancelMagazineSubscription() {
 
 		System.out.println("<< --------------------------------------------------------------------- >>");
@@ -323,7 +371,7 @@ public class Main {
 				break;
 
 				case 1:
-				System.out.println(controller.elimanteMagazineFromUser(searchedUserCC, searchedProductID));
+				System.out.println(controller.eliminateMagazineFromUser(searchedUserCC, searchedProductID));
 				break;
 			}
 		}else{
@@ -334,6 +382,9 @@ public class Main {
 
 	//Functional Requeriment 8: Present Users Library of Bibliographic Products
 
+	/**	
+	 * Navigates the library of bibliographic products for a user based on user input.
+	 */
 	public void navigateUsersLibrary() {
 		System.out.println("<< --------------------------------------------------------------------- >>");
 
@@ -354,7 +405,7 @@ public class Main {
 					case 1:
 						String action;
 
-						System.out.println(controller.showUsersLibrary(searchedUserCC, libraryShelve));
+						System.out.println(controller.showUsersLibrary(userPosition, libraryShelve));
 
 						do{
 							System.out.print("\nSelect one option: \nA. Go to the next page \nS. Go to the previous page\nE. Exit\n: ");
@@ -370,7 +421,7 @@ public class Main {
 									libraryShelve--;
 								}
 
-								String message = controller.showUsersLibrary(searchedUserCC, libraryShelve);
+								String message = controller.showUsersLibrary(userPosition, libraryShelve);
 
 								if(message.equals("Invalid page number")){
 									if(libraryShelve<0){
@@ -389,13 +440,13 @@ public class Main {
 					break;
 
 					case 2:
-						System.out.println(controller.showUsersLibrary(searchedUserCC, libraryShelve));
+						System.out.println(controller.showUsersLibrary(userPosition, libraryShelve));
 						System.out.print("Enter the coordinate x");
 						int x = validateInteger(": ");
 						System.out.print("Enter the coordinate y");
 						int y = validateInteger(": ");
 
-						int productPosition = controller.getProductPositionByCoordinates(x, y, libraryShelve, userPosition);
+						int productPosition = controller.getProductPositionByCordinates(x, y, libraryShelve, userPosition);
 
 						if(productPosition != -1){
 							do{
@@ -405,7 +456,7 @@ public class Main {
 							}while(!action.equalsIgnoreCase("B"));
 
 						}else{
-							System.out.println("There is no product in that coordinates");
+							System.out.println("There is no product in that cordinates");
 						}
 
 					break;
@@ -425,6 +476,9 @@ public class Main {
 
 	//Functional Requeriment 9: Allow a user to simulate a reading session
 
+	/**
+	 * Simulates a reading session for a user based on user input.
+	 */
 	public void simulateReadingSessionByID(){
 
 		System.out.println("<< --------------------------------------------------------------------- >>");
@@ -455,7 +509,6 @@ public class Main {
 
 		}else{
 			System.out.println("We couldn't found the user with the id "+searchedUserCC);
-
 		}
 
 		System.out.println("<< --------------------------------------------------------------------- >>");
@@ -463,12 +516,25 @@ public class Main {
 
 	//Functional Requeriment 10: Automatically generate objects in the system for each type of user and bibliographic product.
 
-	public void innitTest() {
+	/**
+	 * This method initializes the test by printing the result of initializing the model in the controller.
+	 */
+	public void initTest() {
 		System.out.println(controller.initModel());
 	}
 
 	//Functional Requeriment 11: Generate reports with recorded data
 
+	/**
+	 * This method generates different reports based on user selection.
+	 * It prompts the user to choose a report type and prints the corresponding report.
+	 * The available report options are:
+	 * -Report the total accumulated number of pages read on the entire platform.
+	 * -Report the most read book genre and magazine category for the entire platform.
+	 * -Report the Top 5 most read books and Top 5 most read magazines on the platform.
+	 * -Report the number of books sold and total sales value, for each genre.
+	 * -Report the number of active subscriptions and the total value paid for subscriptions.
+	 * */
 	public void generateReport(){
 		System.out.println("<< --------------------------------------------------------------------- >>");
 		System.out.println("Which report do you want to generate?");
@@ -604,6 +670,13 @@ public class Main {
         return input;
 	}
 
+	/**
+	 * Reads an integer value from the user input within a specified range.
+	 * @param message The message to display to the user
+	 * @param min The minimum allowed value
+	 * @param max The maximum allowed value
+	 * @return The validated integer value
+	*/
 	public int validateOptionInputByRange(String message, int leftEndpoint, int rightEndPoint){
 		int option = 0;
 
@@ -624,7 +697,6 @@ public class Main {
 	 * TASKS TO COMPLETE:
 	 * - Complete code implementation
 	 * - Check code implementation
-	 * - javadoc
 	 * - Complete requierement analysis
 	 * - Complete traceability table
 	 * - Check requierement analysis

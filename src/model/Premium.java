@@ -2,13 +2,17 @@ package model;
 
 import java.util.Calendar;
 
+/**
+ * The Premium class represents a premium user who can purchase and manage bibliographic products.
+ * Premium users have no restrictions on the maximum number of books and magazines they can purchase.
+ */
 public class Premium extends User implements IBuy {
 
 	/**
-	 * 
-	 * @param name
-	 * @param cc
-	 * @param vinculationDate
+	 * Creates a new Premium user with the specified name, identification number, and vinculation date.
+	 * @param name The name of the user
+	 * @param cc The identification number of the user
+	 * @param vinculationDate The vinculation date of the user
 	 */
 	public Premium(String name, String cc, Calendar vinculationDate) {
 		super(name, cc, vinculationDate);

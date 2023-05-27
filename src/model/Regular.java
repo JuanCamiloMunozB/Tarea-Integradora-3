@@ -2,21 +2,36 @@ package model;
 
 import java.util.Calendar;
 
+/**
+ * The Regular class represents a regular user who can purchase and manage bibliographic products.
+ * Regular users have restrictions on the maximum number of books and magazines they can purchase.
+ */
 public class Regular extends User implements Advertisable, IBuy{
 
+	/**
+	 * The maximum number of books that can be purchased by a regular user
+	 */
 	private static final int MAX_BOOKS_PURCHASED = 5;
+
+	/**
+	 * The maximum number of magazines that can be subscribed by a regular user
+	 */
 	private static final int MAX_MAGAZINES_PURCHASED = 2;
 
 	/**
-	 * 
-	 * @param name
-	 * @param cc
-	 * @param vinculationDate
+	 * Creates a new Regular user with the specified name, identification number, and vinculation date.
+	 * @param name The name of the user
+	 * @param cc The identification number of the user
+	 * @param vinculationDate The vinculation date of the user
 	 */
 	public Regular(String name, String cc, Calendar vinculationDate) {
 		super(name, cc, vinculationDate);
 	}
 
+	/**
+	 * Counts the number of books owned by the user.
+	 * @return The number of books owned by the user
+	 */
 	public int countBooks() {
 		int booksCounter = 0;
 		
@@ -29,6 +44,10 @@ public class Regular extends User implements Advertisable, IBuy{
 		return booksCounter;
 	}
 
+	/**
+	 * Counts the number of magazines owned by the user.
+	 * @return The number of magazines owned by the user
+	 */
 	public int countMagazines() {
 		int magazinesCounter = 0;
 		
