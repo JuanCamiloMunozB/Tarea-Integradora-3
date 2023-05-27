@@ -244,7 +244,6 @@ public class ReadXSystems {
 
 	//Functional Requeriment 4: Eliminate BibliographicProducts
 
-	//Incomplete: check if is necessary to erase a bibliographic product from user
 	/**
 	 * 
 	 * @param bibliographicProduct
@@ -433,7 +432,8 @@ public class ReadXSystems {
 		"\nReading: "+user.getOwnedProducts().get(productPosition).getName()+
 		"\nReading page "+user.getPagesRead().get(productPosition)+" out of "+user.getOwnedProducts().get(productPosition).getNumPages()+
 		"\nA. Go to the next page \nS. Go to the previous page\nB. Exit\n"+
-		"<<------------------------------------>>\nSelect one option: ";
+		"<<------------------------------------>>"+
+		"\nSelect one option: ";
 	}
 
 	public String changePage(int userPosition, int productPosition, String action){
@@ -468,6 +468,13 @@ public class ReadXSystems {
 		}else{
 			message += "\nInvalid option. Please, try again.\n";
 		}
+
+		if (product instanceof Book && countReadPages % 20 == 0) {
+			message += getAdvertisement(user);
+		}else if (product instanceof Magazine && countReadPages % 5 == 0) {
+			message += getAdvertisement(user);
+		}
+		
 
 		product.setReadPages(product.getReadPages()+numReadPages);
 		user.getPagesRead().set(productPosition, countReadPages);
@@ -505,7 +512,7 @@ public class ReadXSystems {
 
 			int pNumber = products.size()+1;
 
-			BibliographicProduct book = new Book(generateHexIdentifier(), "book"+pNumber, i, "", getCurrentDate(), genre, "book"+pNumber+".jpg", 15.0);
+			BibliographicProduct book = new Book(generateHexIdentifier(), "book"+pNumber, i+50, "", getCurrentDate(), genre, "book"+pNumber+".jpg", 15.0);
 			products.add(book);
 		}
 
@@ -529,7 +536,7 @@ public class ReadXSystems {
 
 			int pNumber = products.size()+1;
 
-			Magazine magazine = new Magazine(generateAlphaIdentifier(), "magazine"+pNumber, i, getCurrentDate(), category, "magazine"+pNumber, 15.0, "Every month");
+			Magazine magazine = new Magazine(generateAlphaIdentifier(), "magazine"+pNumber, i+20, getCurrentDate(), category, "magazine"+pNumber, 15.0, "Every month");
 			products.add(magazine);
 		}
 
@@ -570,10 +577,10 @@ public class ReadXSystems {
 			Transaction bill = new Transaction(getCurrentDate(), products.get(i).getPrice(), products.get(i));
 
 			if (products.get(i) instanceof Book) {
-				((Regular)users.get(regularUserPos)).purchaseBook((Book) products.get(i), bill);
+				((Premium)users.get(premiumUserPos)).purchaseBook((Book) products.get(i), bill);
 
 			} else if (products.get(i) instanceof Magazine) {
-				((Regular)users.get(regularUserPos)).suscribeMagazine((Magazine) products.get(i), bill);
+				((Premium)users.get(premiumUserPos)).suscribeMagazine((Magazine) products.get(i), bill);
 				
 			}
 		}

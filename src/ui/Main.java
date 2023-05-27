@@ -399,7 +399,7 @@ public class Main {
 
 						if(productPosition != -1){
 							do{
-								System.out.print(controller.showReadingSession(userPosition, libraryShelve));
+								System.out.print(controller.showReadingSession(userPosition, productPosition));
 								action = reader.next();
 								System.out.print(controller.changePage(userPosition, productPosition, action));
 							}while(!action.equalsIgnoreCase("B"));
@@ -515,38 +515,12 @@ public class Main {
 
 	/**
      * This method reads and validate a date typed by the user.
-     * @param msg : String the message that will be displayed to the user to indicate what or where to write their response.
+     * @param message : String the message that will be displayed to the user to indicate what or where to write their response.
      * @return : Calendar the input of the user.
      */
-	public Calendar readDate2(String message){
-		
-		Calendar calendarTime = new GregorianCalendar();
-		String date = "";
-		boolean isDateSet; //flag type variable.
-
-		do{
-            isDateSet = false;
-            System.out.println("The date must follow the format: dd/M/yyyy");
-            System.out.println(message); 
-            date = reader.nextLine();
-		
-            try {
-                calendarTime.setTime(format.parse(date));
-                isDateSet= true;
-            } catch (ParseException error) {
-                System.out.println("Invalid option. Please, try again");
-				reader.nextLine();
-            }
-
-        }while(isDateSet == false);
-		
-		return calendarTime;
-	}
-
 	public Calendar readDate(String message){
 		Calendar calendarTime = new GregorianCalendar();
 		// Create an instance of the Calendar class with the current date.
-		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 		// Create an instance of SimpleDateFormat with the pattern "dd/MM/yyyy".
 		format.setLenient(false);
 		// Set strict mode on the SimpleDateFormat object.
@@ -558,7 +532,7 @@ public class Main {
 		while (!validDate) {
 			// Start a loop while the input date is not valid.
 			// Display a message indicating the required date format.
-			System.out.print("\n<<The date must follow the format: dd/MM/yyyy\n "+ message); 
+			System.out.print("\n<<The date must follow the format: dd/M/yy\n "+ message); 
 			// Display the custom message passed as an argument.
 			date = reader.nextLine();
 			// Read the date input by the user.
