@@ -249,13 +249,22 @@ public class ReadXSystems {
 	 * 
 	 * @param bibliographicProduct
 	 */
-	public boolean eliminateBibliographicProductFromArray(String productID) {
-		BibliographicProduct product = searchBibliographicProductByID(productID);
+	public boolean eliminateBibliographicProductFromSystem(String productID) {
+		BibliographicProduct searchedProduct = searchBibliographicProductByID(productID);
 
-		boolean isProductRemoved = products.remove(product);
+		boolean isProductRemoved = products.remove(searchedProduct);
+
+		for(int i = 0; i<users.size(); i++){
+			Transaction searchedTransaction = users.get(i).searchTransactionByProduct(searchedProduct);
+
+			if(searchedProduct instanceof Book){
+				((IBuy)users.get(i)).eliminateBook((Book)searchedProduct, searchedTransaction);
+			}else if(searchedProduct instanceof Magazine){
+				((IBuy)users.get(i)).cancelMagazineSubscription((Magazine)searchedProduct, searchedTransaction);
+			}
+		}
 
 		return isProductRemoved;
-
 	}
 
 	//Functional Requeriment 5: Register regular and premimum users
@@ -295,33 +304,32 @@ public class ReadXSystems {
 	 * @param user
 	 * @param product
 	 */
-	public String addBibliographicProductToUser(String userCC, String productID) {
-		String message = "";
-		int ownedBooks = 0;
-		int ownedMagazines = 0;
-
+	public String addBibliographicProductToUser(String userCC, String productID, Double paidAmount) {
+		String message = "you do not have enough money to complete the payment";
 		BibliographicProduct purchasedProduct =  searchBibliographicProductByID(productID);
 		User purchaser = searchUserByCC(userCC);
-		Double productPrice = purchasedProduct.getPrice();
-		Transaction bill = new Transaction(getCurrentDate(), productPrice, purchasedProduct);
 
-
-		if(purchaser instanceof Regular){	
-			ownedBooks = ((Regular)purchaser).countBooks();
-			ownedMagazines = ((Regular)purchaser).countMagazines();
-		}
-
-		if(purchaser instanceof Premium || ownedBooks<0 || ownedMagazines<2){
-			purchaser.addBibliographicProduct(purchasedProduct);
-			purchaser.addPagesRead(0);
-			purchaser.addTransaction(bill);
-
-			int soldCopies = purchasedProduct.getReadPages() + 1;
-			purchasedProduct.setReadPages(soldCopies);
-		}
+		Double change = purchasedProduct.getPrice()-paidAmount;
 		
-		message = bill.getTransactionInfo();
-		
+		if(change >= 0){
+			Transaction bill = new Transaction(getCurrentDate(), paidAmount, purchasedProduct);
+			boolean isPurchased = false;
+
+			if(purchasedProduct instanceof Book){
+				isPurchased = ((IBuy)purchaser).purchaseBook((Book)purchasedProduct, bill);
+			}else{
+				isPurchased = ((IBuy)purchaser).suscribeMagazine((Magazine)purchasedProduct, bill);
+			}
+
+			if(isPurchased){
+				purchaser.addPagesRead(0);
+				purchaser.addTransaction(bill);
+
+				message = "The transaction has been successfully completed. \n...\n"+bill.getTransactionInfo();
+			}else{
+				message = "payment could not be completed";
+			}
+		}
 		return message;
 	}
 
@@ -332,11 +340,18 @@ public class ReadXSystems {
 	 * @param user
 	 * @param magazine
 	 */
-	public boolean elimanteMagazineFromUser(String userCC, String magazineID) {
+	public String elimanteMagazineFromUser(String userCC, String magazineID) {
+		String message = "This user isn't subscribed to the magazine";
+
 		BibliographicProduct searchedMagazine =  searchBibliographicProductByID(magazineID);
 		User searchedUser = searchUserByCC(userCC);
+		Transaction searchedTransaction = searchedUser.searchTransactionByProduct(searchedMagazine);
 
-		return searchedUser.removeProduct(searchedMagazine);
+		if(((IBuy)searchedUser).cancelMagazineSubscription((Magazine)searchedMagazine, searchedTransaction)){
+			message = "The suscription to the magazine was canceled";
+		}
+
+		return message;
 	}
 
 	//Functional Requeriment 8: Present Users Library of Bibliographic Products
@@ -353,7 +368,7 @@ public class ReadXSystems {
 		if (shelve >= 0 && shelve < library.size()) {
 			BibliographicProduct[][] libraryShelve = library.get(shelve);
 
-			message = "shelve "+ ++shelve +" out of "+library.size()+"\n";
+			message = "Shelve "+ ++shelve +" out of "+library.size()+"\n";
 
 			message += "  |";
 			for (int j = 0; j < COLUMN; j++) {
@@ -520,38 +535,84 @@ public class ReadXSystems {
 
 		for(int i = 0; i<numberOfUsers; i++){
 			int uNumber = users.size()+1;
-			User regularUser = new Regular("user"+uNumber, "ut"+uNumber, getCurrentDate());
+			User regularUser = new Regular("user"+uNumber, "regular"+uNumber, getCurrentDate());
 			users.add(regularUser);
 		}
 
 		for(int i = 0; i<numberOfUsers; i++){
 			int uNumber = users.size()+1;
-			User premiumUser = new Premium("user"+uNumber, "ut"+uNumber, getCurrentDate());
+			User premiumUser = new Premium("user"+uNumber, "premium"+uNumber, getCurrentDate());
 			users.add(premiumUser);
 		}
 
-		int randomUserPos = uInitialSize + random.nextInt(numberOfUsers) + 1;
+		int regularUserPos = uInitialSize + random.nextInt(numberOfUsers);
+		int premiumUserPos = uInitialSize + numberOfUsers + random.nextInt(numberOfUsers);
 
-		for(int i = pInitialSize; i<products.size(); i++){
-			users.get(randomUserPos).addBibliographicProduct(products.get(i));
+
+		int booksToAdd = 5;
+		int magazinesToAdd = 2;
+
+		for (int i = pInitialSize; i < products.size(); i++) {
+			Transaction bill = new Transaction(getCurrentDate(), products.get(i).getPrice(), products.get(i));
+
+    		if (products.get(i) instanceof Book && booksToAdd > 0) {
+				((Regular)users.get(regularUserPos)).purchaseBook((Book) products.get(i), bill);
+				booksToAdd--;
+
+			} else if (products.get(i) instanceof Magazine && magazinesToAdd > 0) {
+				((Regular)users.get(regularUserPos)).suscribeMagazine((Magazine) products.get(i), bill);
+				magazinesToAdd--;
+				
+			}
 		}
+		
+		for (int i = pInitialSize; i < products.size(); i++) {
+			Transaction bill = new Transaction(getCurrentDate(), products.get(i).getPrice(), products.get(i));
 
-		String message = "\n<<-PRODUCTS ID-------------------------------------------------------------------------->>\n";
+			if (products.get(i) instanceof Book) {
+				((Regular)users.get(regularUserPos)).purchaseBook((Book) products.get(i), bill);
+
+			} else if (products.get(i) instanceof Magazine) {
+				((Regular)users.get(regularUserPos)).suscribeMagazine((Magazine) products.get(i), bill);
+				
+			}
+		}
+		
+		String message = "\n<<-PRODUCTS ID-------------------------------------------------------------------------->>\n"+
+		"Number of products generated: "+numberOfProducts*2+"\n";
 
 		for (int i = pInitialSize; i<products.size(); i++) {
 			message += " | "+products.get(i).getID()+" | ";
 		}
 
-		message += "\n<<-USERS-------------------------------------------------------------------------------->>\n";
+		message += "\n<<-USERS-------------------------------------------------------------------------------->>\n"+
+		"Number of users generated: "+numberOfUsers*2+"\n";
 
 		for (int i = uInitialSize; i<users.size(); i++) {
 			message += " | "+ users.get(i).getCC()+" |";
 		}		
 
 		message += "\n<<-------------------------------------------------------------------------------------->>\n"+
-		"Random user that acquiere every product generated before: "+users.get(randomUserPos).getCC()+
-		"\n<<-------------------------------------------------------------------------------------->>\n";
+		"Random premium user that acquiered every product generated before: "+users.get(premiumUserPos).getCC()+
+		"\n<<-------------------------------------------------------------------------------------->>\n"+
+		"Random regular user that acquiered random books and magazines: "+users.get(regularUserPos).getCC()+"\n"+
+		"-Acquired Books: \n";
 
+		for(int i = 0; i < users.get(regularUserPos).getOwnedProducts().size(); i++){
+			if(users.get(regularUserPos).getOwnedProducts().get(i) instanceof Book){
+				message += " | "+users.get(regularUserPos).getOwnedProducts().get(i).getID()+" | ";
+			}
+		}
+
+		message += "\n-Acquired Magazines: \n";
+
+		for(int i = 0; i < users.get(regularUserPos).getOwnedProducts().size(); i++){
+			if(users.get(regularUserPos).getOwnedProducts().get(i) instanceof Magazine){
+				message += " | "+users.get(regularUserPos).getOwnedProducts().get(i).getID()+" | ";
+			}
+		}
+
+		message +="\n<<-------------------------------------------------------------------------------------->>\n";
 
 		return message;
 	}
@@ -873,4 +934,13 @@ public class ReadXSystems {
 		return users.get(position);
 	}
 
+	public String getAdvertisement(User user){
+		String message = "";
+
+		if(user instanceof Advertisable){
+			message = ((Advertisable)user).generateAdvertisement();
+		}
+
+		return message;
+	}
 }

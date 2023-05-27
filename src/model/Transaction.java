@@ -42,11 +42,13 @@ public class Transaction {
 	}
 
 	public String getTransactionInfo(){
-		return "\n******************BILL******************\n"+
+		return "\n<<------------------BILL------------------>>\n"+
 				"Date of purchse : "+getRealizationDateFormated()+"\n"+
+				"Purchased product: "+purchasedProduct.getName()+"\n"+
+				"Price: "+purchasedProduct.getPrice()+"\n"+
 				"Paid amount: "+paidAmount+"\n"+
-				"PurchasedProduct: "+purchasedProduct.getName()+
-				"\n****************************************\n";
+				"Change: "+(paidAmount-purchasedProduct.getPrice())+
+				"\n<<------------------------------------>>\n";
 	}
 
 }

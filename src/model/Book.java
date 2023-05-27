@@ -2,7 +2,7 @@ package model;
 
 import java.util.Calendar;
 
-public class Book extends BibliographicProduct {
+public class Book extends BibliographicProduct{
 
 	private String review;
 	private Genre genre;
@@ -57,5 +57,4 @@ public class Book extends BibliographicProduct {
 	public void setGenre(Genre genre) {
 		this.genre = genre;
 	}
-
 }

@@ -4,7 +4,7 @@ import java.util.Random;;
 
 public interface Advertisable {
     
-    public default String getAdvertisement(){
+    public default String generateAdvertisement(){
         String addString = "";
         Random random = new Random();
         int randomNumber = random.nextInt(3) + 1;

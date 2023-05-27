@@ -102,4 +102,7 @@ public abstract class BibliographicProduct {
 		this.readPages = readPages;
 	}
 
+	public void setSoldCopies(int soldCopies){
+		this.soldCopies = soldCopies;
+	}
 }

@@ -51,7 +51,8 @@ public class Main {
 			"8. Simulate a reading session\n"+
 			"9. Automatically generate objects in the system for testing.\n"+
 			"10. Generate reports with recorded data\n"+
-			"0. Exit program."
+			"0. Exit program.\n"+
+			"<< --------------------------------------------------------------------- >>\n"
 		);
 	}
 
@@ -225,7 +226,7 @@ public class Main {
 		System.out.print("\n<<Type the identifier of the product you want to search: ");
 		String searchedProductID = reader.next();
 
-		boolean isProductRemoved = controller.eliminateBibliographicProductFromArray(searchedProductID);
+		boolean isProductRemoved = controller.eliminateBibliographicProductFromSystem(searchedProductID);
 
 		if(isProductRemoved){
 			System.out.println("The product has been removed. ");
@@ -280,8 +281,9 @@ public class Main {
 			int searchedProductType = controller.checkProductType(searchedProductID);
 
 			if(searchedProductType != -1){
-				System.out.println("The transaction has been successfully completed. \n...");
-				System.out.println(controller.addBibliographicProductToUser(searchedUserCC, searchedProductID));
+				System.out.println("\nType the amount you will pay with");
+				Double paidAmount = validateDouble(searchedProductID);
+				System.out.println(controller.addBibliographicProductToUser(searchedUserCC, searchedProductID,paidAmount));
 			}else{
 				System.out.println("We couldn't found the product with the id "+searchedProductID);
 			}			
@@ -321,8 +323,7 @@ public class Main {
 				break;
 
 				case 1:
-				controller.elimanteMagazineFromUser(searchedUserCC, searchedProductID);
-				System.out.println("The suscription to the magazine was canceled. ");
+				System.out.println(controller.elimanteMagazineFromUser(searchedUserCC, searchedProductID));
 				break;
 			}
 		}else{

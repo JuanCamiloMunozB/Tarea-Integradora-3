@@ -53,14 +53,6 @@ public abstract class User {
 		return this.pagesRead;
 	}
 
-	/**
-	 * 
-	 * @param product
-	 */
-	public boolean addBibliographicProduct(BibliographicProduct product) {
-		return ownedProducts.add(product);
-	}
-
 	public boolean addPagesRead(int pages){
 		return pagesRead.add(pages);
 	}
@@ -73,10 +65,6 @@ public abstract class User {
 		return invoices.add(transaction);
 	}
 
-	public boolean removeProduct(BibliographicProduct product){
-		return ownedProducts.remove(product);
-	}
-
 	public BibliographicProduct searchOwnedProductByID(String searchedProductID) {
 		BibliographicProduct searchedProduct = null;
 		
@@ -85,7 +73,6 @@ public abstract class User {
 				searchedProduct = product;
 			}
 		}
-
 		return searchedProduct;
 	}
 
@@ -99,8 +86,23 @@ public abstract class User {
 				isFound = true;
 			}
 		}
-
 		return productPosition;
 	}
 
+	public boolean isProductAlreadyPurchased(BibliographicProduct product){
+		return ownedProducts.contains(product);
+	}
+
+	public Transaction searchTransactionByProduct(BibliographicProduct product){
+		boolean isFound = false;
+		Transaction searchedTransaction = null;
+
+		for(int i = 0; i<invoices.size() && isFound; i++){
+			if(invoices.get(i).getPurchasedProduct() == product){
+				searchedTransaction = invoices.get(i);
+			}
+		}
+
+		return searchedTransaction;
+	}
 }
