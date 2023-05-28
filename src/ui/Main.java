@@ -544,7 +544,7 @@ public class Main {
 		System.out.println("4. Report the number of books sold and total sales value, for each gender");
 		System.out.println("5. Report the number of active subscriptions and the total value paid for subscriptions.");
 
-		int answer = validateOptionInputByRange("", 1, 5);
+		int answer = validateOptionInputByRange(": ", 1, 5);
 
 		switch(answer){
 
@@ -693,15 +693,3 @@ public class Main {
 		return option;
 	}
 }
-
-	/*
-	 * TASKS TO COMPLETE:
-	 * - Complete code implementation
-	 * - Check code implementation
-	 * - Complete requierement analysis
-	 * - Complete traceability table
-	 * - Check requierement analysis
-	 * - Check traceability table
-	 * - Complete Class Diagram
-	 * - Make program execution video
-	 */

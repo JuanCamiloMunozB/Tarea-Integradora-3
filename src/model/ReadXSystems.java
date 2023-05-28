@@ -831,24 +831,33 @@ public class ReadXSystems {
 	 */
 	public String getTop5BookList(){
 		String message = "";
-		List<BibliographicProduct> temp = products;
-		List<BibliographicProduct> top5BookList = new ArrayList<>();
+		List<Book> top5BookList = new ArrayList<>();
+		List<Book> books = new ArrayList<>();
+
+		for(int i = 0; i<products.size();i++){
+			if(products.get(i) instanceof Book){
+				books.add((Book)products.get(i));
+			}
+		}
 
 		for (int i = 0; i < 5; i++) {
 			int maxReadBookIndex = 0;
 	
-			for (int j = 1; j < temp.size(); j++) {
-				if (temp.get(j).getReadPages() > temp.get(maxReadBookIndex).getReadPages() && temp.get(i) instanceof Book) {
+			for (int j = 1; j < books.size(); j++) {
+				if (books.get(j).getReadPages() > books.get(maxReadBookIndex).getReadPages()) {
 					maxReadBookIndex = j;
 				}
 			}
 	
-			top5BookList.add(temp.remove(maxReadBookIndex));
+			if (maxReadBookIndex < books.size()) {
+				top5BookList.add(books.get(maxReadBookIndex));
+				books.remove(maxReadBookIndex);
+			}
 		}
 
 		for(int i = 0; i<top5BookList.size(); i++){
-			message = i+". Name: "+top5BookList.get(i).getName()+"\n "+
-			" -Genre: "+((Book)top5BookList.get(i)).getGenreString()+"\n "+
+			message += i+". Name: "+top5BookList.get(i).getName()+"\n "+
+			" -Genre: "+top5BookList.get(i).getGenreString()+"\n "+
 			" -Read pages: "+top5BookList.get(i).getReadPages()+"\n ";
 		}
 
@@ -861,23 +870,34 @@ public class ReadXSystems {
 	 */
 	public String getTop5MagazinesList(){
 		String message = "";
-		List<BibliographicProduct> temp = products;
-		List<BibliographicProduct> top5MagazineList = new ArrayList<>();
+		List<Magazine> top5MagazineList = new ArrayList<>();
+		List<Magazine> magazines = new ArrayList<>();
+
+		for(int i = 0; i<products.size();i++){
+			if(products.get(i) instanceof Magazine){
+				magazines.add((Magazine)products.get(i));
+			}
+		}
 
 		for (int i = 0; i < 5; i++) {
 			int maxReadMagazineIndex = 0;
 	
-			for (int j = 1; j < temp.size(); j++) {
-				if (temp.get(j).getReadPages() > temp.get(maxReadMagazineIndex).getReadPages() && temp.get(i) instanceof Book) {
+			for (int j = 1; j < magazines.size(); j++) {
+				if (magazines.get(j).getReadPages() > magazines.get(maxReadMagazineIndex).getReadPages()) {
 					maxReadMagazineIndex = j;
 				}
 			}
-			top5MagazineList.add(temp.remove(maxReadMagazineIndex));
+			
+			if(maxReadMagazineIndex < magazines.size()){
+				top5MagazineList.add(magazines.get(maxReadMagazineIndex));
+        		magazines.remove(maxReadMagazineIndex);
+			}
+		
 		}
 
 		for(int i = 0; i<5; i++){
-			message = i+". Name: "+top5MagazineList.get(i).getName()+"\n "+
-			" -Category: "+((Magazine)top5MagazineList.get(i)).getCategoryString()+"\n "+
+			message += i+". Name: "+top5MagazineList.get(i).getName()+"\n "+
+			" -Category: "+ top5MagazineList.get(i).getCategoryString()+"\n "+
 			" -Read pages: "+top5MagazineList.get(i).getReadPages()+"\n ";
 		}
 
