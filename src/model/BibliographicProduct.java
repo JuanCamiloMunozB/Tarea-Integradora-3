@@ -72,7 +72,7 @@ public abstract class BibliographicProduct {
 		this.url = url;
 		this.price = price;
 
-		this.formatter = new SimpleDateFormat("dd/M/yy");
+		this.formatter = new SimpleDateFormat("dd/mm/yyyy");
 		
 		soldCopies = 0;
 		readPages = 0;

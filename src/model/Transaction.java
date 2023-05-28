@@ -40,7 +40,7 @@ public class Transaction {
 		this.paidAmount = paidAmount;
 		this.purchasedProduct = purchaseProduct;
 
-		this.formatter = new SimpleDateFormat("dd/M/yy");
+		this.formatter = new SimpleDateFormat("dd/mm/yyyy");
 	}
 
 	/**

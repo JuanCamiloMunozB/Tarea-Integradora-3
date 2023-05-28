@@ -3,7 +3,6 @@ package ui;
 import java.util.Scanner;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.text.ParseException;
 
 import model.ReadXSystems;
@@ -35,7 +34,7 @@ public class Main {
 	public Main(){
 		reader = new Scanner(System.in);
 		controller = new ReadXSystems();
-		format = new SimpleDateFormat("dd/M/yy"); 
+		format = new SimpleDateFormat("dd/mm/yyyy"); 
 	}
 
 	/**
@@ -76,7 +75,7 @@ public class Main {
 			"9. Automatically generate objects in the system for testing.\n"+
 			"10. Generate reports with recorded data\n"+
 			"0. Exit program.\n"+
-			"<< --------------------------------------------------------------------- >>\n"
+			"<< --------------------------------------------------------------------- >>"
 		);
 	}
 
@@ -131,7 +130,9 @@ public class Main {
 			break;
 
 			default:
+				System.out.println("<< --------------------------------------------------------------------- >>");
 				System.out.println("Invalid Option. Please, try again");
+				System.out.println("<< --------------------------------------------------------------------- >>");
 			break;
 		}
 	}
@@ -146,12 +147,12 @@ public class Main {
 
 		System.out.println("<< --------------------------------------------------------------------- >>");
 
-		System.out.print("\n<<Type the name of the product: ");
+		System.out.print("<<Type the name of the product: ");
 		String name = reader.nextLine();
 		
 		int numPages = validateInteger("\n<<Type the product number of pages: ");
 
-		Calendar publicationDate = readDate("Type the date of publication: ");
+		Calendar publicationDate = readDate("<<Type the date of publication: ");
 		
 		System.out.print("\n<<Type the url with the product's cover: ");
 		String url = reader.nextLine();
@@ -161,26 +162,25 @@ public class Main {
 		System.out.println("\nAvailable bibliographic products:\n 1. Books \n 2. Magazine");
 		int typeOption = validateOptionInputByRange(" <<Select product's type: ", 1, 2);
 	
-		
 		switch(typeOption){
 			case 1:
 
 				System.out.print("\n<<Type the book's review: ");
 				String review = reader.nextLine();
 
-				System.out.println("\n<<Avilable book's genres:\n 1.Science fiction\n 2.Fantasy\n 3.Historical novel");
-				int genreOption = validateOptionInputByRange(" Select the genre: ", 1, 3);
+				System.out.println("\nAvilable book's genres:\n 1.Science fiction\n 2.Fantasy\n 3.Historical novel");
+				int genreOption = validateOptionInputByRange(" <<Select the genre: ", 1, 3);
 				
 				System.out.println(controller.addBook(name, numPages, review, publicationDate, genreOption, url, price));
 
 			break;
 
 			case 2:
-				System.out.print("\n<<Type the emission periodicity");
+				System.out.print("\n<<Type the emission periodicity: ");
 				String periodicityEmission = reader.nextLine();
 
-				System.out.println("\n<<Avilable magazines's categories:\n 1.Varieties\n 2.Design\n 3.Scientific");
-				int categoryOption = validateOptionInputByRange(" Select the category: ", 1, 3);
+				System.out.println("\nAvilable magazines's categories:\n 1.Varieties\n 2.Design\n 3.Scientific");
+				int categoryOption = validateOptionInputByRange(" <<Select the category: ", 1, 3);
 
 				System.out.println(controller.addMagazine(name, numPages, publicationDate, categoryOption, url, price, periodicityEmission));
 
@@ -203,16 +203,16 @@ public class Main {
 
 		System.out.println("<< --------------------------------------------------------------------- >>");
 
-		System.out.print("\n<<Type the identifier of the product you want to search: ");
-		String searchedProductID = reader.next();
+		System.out.print("<<Type the identifier of the product you want to search: ");
+		String searchedProductID = reader.nextLine();
 
 		int searchedProductPosition = controller.searchBibliographicProductArrayPosition(searchedProductID);
 
 		if(searchedProductPosition != -1){
 			int searchedProductType = controller.checkProductType(searchedProductID);
 
-			System.out.print("\nCurrent name: "+controller.getProductByPositon(searchedProductPosition).getName()+"<<Type the name of the product: ");
-			String name = reader.next();
+			System.out.print("\nCurrent name: "+controller.getProductByPositon(searchedProductPosition).getName()+"\n<<Type the name of the product: ");
+			String name = reader.nextLine();
 
 			System.out.println("\nCurrent number of pages: "+controller.getProductByPositon(searchedProductPosition).getNumPages());
 			int numPages = validateInteger("<<Type the product number of pages: ");
@@ -220,26 +220,26 @@ public class Main {
 			System.out.println("\nCurrent publicationDate: "+controller.getProductByPositon(searchedProductPosition).getPublicationDateFormated());
 			Calendar publicationDate = readDate("<<Type the date of publication: ");
 
-			System.out.print("\nCurrent URL: "+controller.getProductByPositon(searchedProductPosition).getURL()+"<<Type the url with the product's cover: ");
-			String url = reader.next();
+			System.out.print("\nCurrent URL: "+controller.getProductByPositon(searchedProductPosition).getURL()+"\n<<Type the url with the product's cover: ");
+			String url = reader.nextLine();
 
-			System.out.println("\nCurrent price: "+controller.getProductByPositon(searchedProductPosition).getPrice());
+			System.out.println("\nCurrent price: $"+controller.getProductByPositon(searchedProductPosition).getPrice());
 			Double price = validateDouble("<<Type the price of the product: ");
 
 			if(searchedProductType == 0){
-				System.out.print("\nCurrent review: "+controller.getProductCastedBook(searchedProductPosition).getReview()+"<<Type the book's review: ");
-				String review = reader.next();
+				System.out.print("\nCurrent review: "+controller.getProductCastedBook(searchedProductPosition).getReview()+"\n<<Type the book's review: ");
+				String review = reader.nextLine();
 
-				System.out.println("\nCurrent genre: "+controller.getProductCastedBook(searchedProductPosition).getGenreString()+"Avilable book's genres:\n1.Science fiction\n2.Fantasy\n3.Historical novel");
+				System.out.println("\nCurrent genre: "+controller.getProductCastedBook(searchedProductPosition).getGenreString()+"\nAvilable book's genres:\n1.Science fiction\n2.Fantasy\n3.Historical novel");
 				int genreOption = validateOptionInputByRange("<<Select the genre: ", 1, 3);
 
 				System.out.println(controller.modifyBookInfo(searchedProductPosition, name, numPages, review, publicationDate, genreOption, url, price));
 
 			}else if(searchedProductType == 1){	
-				System.out.print("\nCurrent periodicity emission: "+controller.getProductCastedMagazine(searchedProductPosition).getPeriodicityEmission()+"<<Type the emission periodicity");
+				System.out.print("\nCurrent periodicity emission: "+controller.getProductCastedMagazine(searchedProductPosition).getPeriodicityEmission()+"\n<<Type the emission periodicity: ");
 				String periodicityEmission = reader.nextLine();
 
-				System.out.println("\nCurrent category: "+controller.getProductCastedMagazine(searchedProductPosition).getCategoryString()+"Avilable magazines's categories:\n1.Varieties\n2.Design\n3.Scientific");
+				System.out.println("\nCurrent category: "+controller.getProductCastedMagazine(searchedProductPosition).getCategoryString()+"\nAvilable magazines's categories:\n1.Varieties\n2.Design\n3.Scientific");
 				int categoryOption = validateOptionInputByRange("<<Select the category: ", 1, 3);
 
 				System.out.println(controller.modifyMagazineInfo(searchedProductPosition, name, numPages, publicationDate, categoryOption, url, price, periodicityEmission));
@@ -260,7 +260,7 @@ public class Main {
 		System.out.println("<< --------------------------------------------------------------------- >>");
 
 		System.out.print("\n<<Type the identifier of the product you want to search: ");
-		String searchedProductID = reader.next();
+		String searchedProductID = reader.nextLine();
 
 		boolean isProductRemoved = controller.eliminateBibliographicProductFromSystem(searchedProductID);
 
@@ -399,7 +399,7 @@ public class Main {
 			
 			do{
 				System.out.print("<<Type what you want to do:\n 1. Navigate library\n 2. Start Reading session\n 3. Return to Main Menu\n");
-				answer = validateOptionInputByRange(": ", 1, 3);
+				answer = validateOptionInputByRange(" : ", 1, 3);
 
 				switch(answer){
 					case 1:
@@ -408,8 +408,8 @@ public class Main {
 						System.out.println(controller.showUsersLibrary(userPosition, libraryShelve));
 
 						do{
-							System.out.print("\nSelect one option: \nA. Go to the next page \nS. Go to the previous page\nE. Exit\n: ");
-							action = reader.next();
+							System.out.print("\nSelect one option: \nA. Go to the next shelve \nS. Go to the previous shelve\nE. Exit\n: ");
+							action = reader.nextLine();
 
 							if(action.equalsIgnoreCase("e")){
 								System.out.println("Returning to the menu");
@@ -451,7 +451,7 @@ public class Main {
 						if(productPosition != -1){
 							do{
 								System.out.print(controller.showReadingSession(userPosition, productPosition));
-								action = reader.next();
+								action = reader.nextLine();
 								System.out.print(controller.changePage(userPosition, productPosition, action));
 							}while(!action.equalsIgnoreCase("B"));
 
@@ -499,7 +499,7 @@ public class Main {
 				
 				do{
 					System.out.print(controller.showReadingSession(userPosition, productPosition));
-					action = reader.next();
+					action = reader.nextLine();
 					System.out.print(controller.changePage(userPosition, productPosition, action));
 				}while(!action.equalsIgnoreCase("B"));
 
@@ -577,7 +577,7 @@ public class Main {
 
 	}
 
-	//Other functionalities
+	//Tools
 
 	/**
      * This method reads and validate a date typed by the user.
@@ -585,7 +585,7 @@ public class Main {
      * @return : Calendar the input of the user.
      */
 	public Calendar readDate(String message){
-		Calendar calendarTime = new GregorianCalendar();
+		Calendar calendarTime = Calendar.getInstance();
 		// Create an instance of the Calendar class with the current date.
 		// Create an instance of SimpleDateFormat with the pattern "dd/MM/yyyy".
 		format.setLenient(false);
@@ -598,7 +598,7 @@ public class Main {
 		while (!validDate) {
 			// Start a loop while the input date is not valid.
 			// Display a message indicating the required date format.
-			System.out.print("\n<<The date must follow the format: dd/M/yy\n "+ message); 
+			System.out.print("\nThe date must follow the format: dd/mm/yyyy\n"+ message); 
 			// Display the custom message passed as an argument.
 			date = reader.nextLine();
 			// Read the date input by the user.
@@ -659,7 +659,8 @@ public class Main {
 
             if(reader.hasNextDouble()){
                 stopCondition = true;
-                input = reader.nextDouble();          
+                input = reader.nextDouble();  
+				reader.nextLine();        
             }
             else{
                 System.out.println("Invalid option. Please, try again");
@@ -673,21 +674,21 @@ public class Main {
 	/**
 	 * Reads an integer value from the user input within a specified range.
 	 * @param message The message to display to the user
-	 * @param min The minimum allowed value
-	 * @param max The maximum allowed value
+	 * @param leftEndPoint The minimum allowed value
+	 * @param rightEndPoint The maximum allowed value
 	 * @return The validated integer value
 	*/
-	public int validateOptionInputByRange(String message, int leftEndpoint, int rightEndPoint){
+	public int validateOptionInputByRange(String message, int leftEndPoint, int rightEndPoint){
 		int option = 0;
 
 		do{
 			option = validateInteger(message);
 
-			if(option<leftEndpoint || option>rightEndPoint){
-				System.out.println("the option is out of range. Plese, try again");
+			if(option<leftEndPoint || option>rightEndPoint){
+				System.out.println("the option is out of range. Please, try again");
 			}
 
-		}while(option<leftEndpoint || option>rightEndPoint);
+		}while(option<leftEndPoint || option>rightEndPoint);
 
 		return option;
 	}

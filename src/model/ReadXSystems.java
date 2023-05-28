@@ -289,19 +289,22 @@ public class ReadXSystems {
 	 */
 	public boolean eliminateBibliographicProductFromSystem(String productID) {
 		BibliographicProduct searchedProduct = searchBibliographicProductByID(productID);
+		boolean isProductRemoved = false;
 
-		boolean isProductRemoved = products.remove(searchedProduct);
+		if(searchedProduct != null){
+			isProductRemoved = products.remove(searchedProduct);
 
-		for(int i = 0; i<users.size(); i++){
-			Transaction searchedTransaction = users.get(i).searchTransactionByProduct(searchedProduct);
+			for(int i = 0; i<users.size(); i++){
+				Transaction searchedTransaction = users.get(i).searchTransactionByProduct(searchedProduct);
 
-			if(searchedProduct instanceof Book){
-				((IBuy)users.get(i)).eliminateBook((Book)searchedProduct, searchedTransaction);
-			}else if(searchedProduct instanceof Magazine){
-				((IBuy)users.get(i)).cancelMagazineSubscription((Magazine)searchedProduct, searchedTransaction);
+				if(searchedProduct instanceof Book){
+					((IBuy)users.get(i)).eliminateBook((Book)searchedProduct, searchedTransaction);
+				}else if(searchedProduct instanceof Magazine){
+					((IBuy)users.get(i)).cancelMagazineSubscription((Magazine)searchedProduct, searchedTransaction);
+				}
 			}
 		}
-
+		
 		return isProductRemoved;
 	}
 
@@ -374,7 +377,7 @@ public class ReadXSystems {
 
 		Double change = purchasedProduct.getPrice()-paidAmount;
 		
-		if(change >= 0){
+		if(change <= 0){
 			Transaction bill = new Transaction(getCurrentDate(), paidAmount, purchasedProduct);
 			boolean isPurchased = false;
 
@@ -422,7 +425,7 @@ public class ReadXSystems {
 
 	/**
 	 * Displays the user's library, showing the content of a specific shelf.
-	 * @param userCC the identification number of the user
+	 * @param userPosition the searched user position.
 	 * @param shelve the shelf number to display
 	 * @return a message containing the content of the specified shelf in the user's library
 	 */
@@ -434,7 +437,7 @@ public class ReadXSystems {
 		if (shelve >= 0 && shelve < library.size()) {
 			BibliographicProduct[][] libraryShelve = library.get(shelve);
 
-			message = "Shelve "+ ++shelve +" out of "+library.size()+"\n";
+			message = "Shelve "+ (shelve + 1) +" out of "+library.size()+"\n";
 
 			message += "  |";
 			for (int j = 0; j < COLUMN; j++) {
@@ -454,27 +457,43 @@ public class ReadXSystems {
 				message += "\n";
 			}
 		} else {
-			message = "Invalid page number";
+			message = "Invalid shelve number";
 		}
 		
 		return message;
 	}
 	
 	/**
-	 * Initializes the library for a user by organizing their owned products into shelves.
+	 * Initializes the library for a user by organizing their owned products by the publication date into shelves.
 	 * @param user the user whose library is being initialized
 	 * @return a list of shelves containing the user's owned products
 	 */
 	public List<BibliographicProduct[][]> initLibrary(User user) {
 		List<BibliographicProduct[][]> library = new ArrayList<>();
 		int index = 0;
+
+		List<BibliographicProduct> temp = new ArrayList<>(user.getOwnedProducts());
+		List<BibliographicProduct> productsByPublicationDate = new ArrayList<>();
+
+		while (!temp.isEmpty()) {
+			int minPublicationDateIndex = 0;
 	
-		while (index < user.getOwnedProducts().size()) {
+			for (int j = 1; j < temp.size(); j++) {
+				if (temp.get(j).getPublicationDate().compareTo(temp.get(minPublicationDateIndex).getPublicationDate()) < 0) {
+					minPublicationDateIndex = j;
+				}
+			}
+	
+			productsByPublicationDate.add(temp.get(minPublicationDateIndex));
+			temp.remove(minPublicationDateIndex);
+		}
+
+		while (index < productsByPublicationDate.size()) {
 			BibliographicProduct[][] shelve = new BibliographicProduct[ROW][COLUMN];
 			for (int i = 0; i < ROW; i++) {
 				for (int j = 0; j < COLUMN; j++) {
-					if (index < user.getOwnedProducts().size()) {
-						shelve[i][j] = user.getOwnedProducts().get(index);
+					if (index < productsByPublicationDate.size()) {
+						shelve[i][j] = productsByPublicationDate.get(index);
 						index++;
 					} else {
 						break;
@@ -486,6 +505,7 @@ public class ReadXSystems {
 	
 		return library;
 	}
+
 
 	//Functional Requeriment 9: Allow a user to simulate a reading session
 	
@@ -609,7 +629,7 @@ public class ReadXSystems {
 
 			int pNumber = products.size()+1;
 
-			BibliographicProduct book = new Book(generateHexIdentifier(), "book"+pNumber, i+50, "", getCurrentDate(), genre, "book"+pNumber+".jpg", 15.0);
+			BibliographicProduct book = new Book(generateHexIdentifier(), "book"+pNumber, i+50, "test book #"+pNumber, getCurrentDate(), genre, "book"+pNumber+".jpg", 15.0);
 			products.add(book);
 		}
 
@@ -672,13 +692,11 @@ public class ReadXSystems {
 		
 		for (int i = pInitialSize; i < products.size(); i++) {
 			Transaction bill = new Transaction(getCurrentDate(), products.get(i).getPrice(), products.get(i));
-
 			if (products.get(i) instanceof Book) {
 				((Premium)users.get(premiumUserPos)).purchaseBook((Book) products.get(i), bill);
 
 			} else if (products.get(i) instanceof Magazine) {
 				((Premium)users.get(premiumUserPos)).suscribeMagazine((Magazine) products.get(i), bill);
-				
 			}
 		}
 		
@@ -699,7 +717,7 @@ public class ReadXSystems {
 		message += "\n<<-------------------------------------------------------------------------------------->>\n"+
 		"Random premium user that acquiered every product generated before: "+users.get(premiumUserPos).getCC()+
 		"\n<<-------------------------------------------------------------------------------------->>\n"+
-		"Random regular user that acquiered random books and magazines: "+users.get(regularUserPos).getCC()+"\n"+
+		"Random regular user that acquiered the first 5 generated books and the 2 first magazines: "+users.get(regularUserPos).getCC()+"\n"+
 		"-Acquired Books: \n";
 
 		for(int i = 0; i < users.get(regularUserPos).getOwnedProducts().size(); i++){
@@ -944,7 +962,7 @@ public class ReadXSystems {
 		return message;
 	}
 
-	//Other functionalities
+	//Tools
 
 	/**
 	 * Searches for a bibliographic product by its ID.
@@ -1052,8 +1070,9 @@ public class ReadXSystems {
 		return productsType;
 	}
 
-	/**Checks the type of a user based on their CC (Credit Card) number.
-	 * @param userCC the CC number of the user to check.
+	/**
+	 * Checks the type of a user based on their CC (Credit Card) number.
+	 * @param usersCC the CC number of the user to check.
 	 * @return an integer representing the user type: 0 for Regular user, 1 for Premium user, and -1 if the user is not found.
 	 */
 	public int checkUserType(String usersCC){

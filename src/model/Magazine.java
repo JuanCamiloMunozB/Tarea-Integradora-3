@@ -58,11 +58,11 @@ public class Magazine extends BibliographicProduct {
 		String category = "";
 		
 		if(this.category == Category.VARIETIES){
-			category = "Science Fiction ";
+			category = "Varieties ";
 		}else if(this.category == Category.DESIGN){
-			category = "Fantasy ";
+			category = "Design ";
 		}else if(this.category == Category.SCIENTIFIC){
-			category = "Historical Novel";
+			category = "Scientific";
 		}
 
 		return category;
